@@ -27,7 +27,8 @@ function! s:NewLog()
 	let author = expand("$EMAIL")
 	let gerdate = strftime("%d.%m.%Y")
 	" find first log entry
-	execute "silent normal! gg/^[0-3]\<cr>"
+	execute "silent normal! gg"
+	call <SID>NextLog(1, 0, 0)
 	" insert new log entry header
 	execute "silent normal! O" . gerdate . "\<c-v>\t" . author . "\r"
 	" insert first bullet point
