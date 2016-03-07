@@ -22,6 +22,18 @@ function! s:NextLog(type, backwards, visual)
 
 	execute 'silent normal! ' . vcount . dir . pattern . dir . "\r"
 endfunction
+
+function! s:NewLog()
+	let author = expand("$EMAIL")
+	let gerdate = strftime("%d.%m.%Y")
+	" find first log entry
+	execute "silent normal! gg/^[0-3]\<cr>"
+	" insert new log entry header
+	execute "silent normal! O" . gerdate . "\<c-v>\t" . author . "\r"
+	" insert first bullet point
+	execute "silent normal! O* \<esc>"
+endfunction
+
 " }}}
 
 " {{{ Mappings
@@ -52,6 +64,10 @@ vnoremap <script> <buffer> <silent> ][
 
 vnoremap <script> <buffer> <silent> []
         \ :<C-u>call <SID>NextLog(2, 1, 1)<CR>
+
+" New log
+noremap <script> <buffer> <silent> <leader>ln
+        \ :<C-u>call <SID>NewLog()<CR>
 " }}}
 
 " vim: fdm=marker
