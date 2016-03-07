@@ -38,7 +38,7 @@ endfunction
 " }}}
 
 " {{{ Mappings
-" Normal mode
+" Navigation: Normal mode
 "  logbuch entry date lines
 noremap <script> <buffer> <silent> ]]
         \ :<C-u>call <SID>NextLog(1, 0, 0)<CR>
@@ -53,7 +53,7 @@ noremap <script> <buffer> <silent> ][
 noremap <script> <buffer> <silent> []
         \ :<C-u>call <SID>NextLog(2, 1, 0)<CR>
 
-" Visual mode
+" Navigation: Visual mode
 vnoremap <script> <buffer> <silent> ]]
         \ :<C-u>call <SID>NextLog(1, 0, 1)<CR>
 
