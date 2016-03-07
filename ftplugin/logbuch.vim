@@ -32,7 +32,7 @@ function! s:NewLog()
 	" insert new log entry header
 	execute "silent normal! O" . gerdate . "\<c-v>\t" . author . "\r"
 	" insert first bullet point
-	execute "silent normal! O* \<esc>"
+	execute "silent normal! O* "
 endfunction
 
 " }}}
