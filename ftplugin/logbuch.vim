@@ -35,17 +35,33 @@ function! s:NewLog()
 	execute "silent normal! O* "
 endfunction
 
-function! s:RemoteGF()
+" extact <protocol>://<host> from filename
+function! s:NetrwHost()
 	let filename = expand("%")
 	if filename =~? "^[a-z]\\+://[a-z0-9-\\.]\\+/"
-		" extact <protocol>://<host> from filename
 		let netrw_host = fnamemodify(filename,
 					\":s?\\(^scp:\\/\\/[a-zA-Z0-9-\\.]\\+\/\\).*?\\1?")
+		return netrw_host
+	endif
+		return ""
+endfunction
+
+" Open file under cursor; like `:e <cfile>` but open on same host as current
+" file if using netrw
+function! s:RemoteGF()
+	let netrw_host = s:NetrwHost()
+	if netrw_host != ""
 		let linked_file = netrw_host . expand("<cfile>")
 		execute 'edit ' . fnameescape(linked_file)
 	else
 		execute 'edit <cfile>'
 	endif
+endfunction
+
+" Open an :edit prompt with the remote (<protocol>://<host>) filled in
+function! s:NetrwPrompt()
+	let netrw_host = s:NetrwHost()
+	exe input("", "edit " . netrw_host)
 endfunction
 
 " }}}
@@ -83,10 +99,14 @@ vnoremap <script> <buffer> <silent> []
 noremap <script> <buffer> <silent> <leader>ln
         \ :<C-u>call <SID>NewLog()<CR>
 
+" Remote Editing:
 " Open file under cursor; like `:e <cfile>` but open on same host as current
 " file if using netrw
 noremap <script> <buffer> <silent> <leader>lf
         \ :<C-u>call <SID>RemoteGF()<CR>
+" Open an :edit prompt with the remote (<protocol>://<host>) filled in
+noremap <buffer> <leader>le :call <SID>NetrwPrompt()<CR>
+
 
 " }}}
 
