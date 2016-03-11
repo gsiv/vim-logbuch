@@ -1,5 +1,5 @@
 scriptencoding utf-8
-" {{{ Function
+" {{{ Functions
 function! s:NextLog(type, backwards, visual)
 
 	let vcount = v:count1
@@ -33,6 +33,19 @@ function! s:NewLog()
 	execute "silent normal! O" . gerdate . "\<c-v>\t" . author . "\r"
 	" insert first bullet point
 	execute "silent normal! O* "
+endfunction
+
+function! s:RemoteGF()
+	let filename = expand("%")
+	if filename =~? "^[a-z]\\+://[a-z0-9-\\.]\\+/"
+		" extact <protocol>://<host> from filename
+		let netrw_host = fnamemodify(filename,
+					\":s?\\(^scp:\\/\\/[a-zA-Z0-9-\\.]\\+\/\\).*?\\1?")
+		let linked_file = netrw_host . expand("<cfile>")
+		execute 'edit ' . fnameescape(linked_file)
+	else
+		execute 'edit <cfile>'
+	endif
 endfunction
 
 " }}}
@@ -69,6 +82,12 @@ vnoremap <script> <buffer> <silent> []
 " New log
 noremap <script> <buffer> <silent> <leader>ln
         \ :<C-u>call <SID>NewLog()<CR>
+
+" Open file under cursor; like `:e <cfile>` but open on same host as current
+" file if using netrw
+noremap <script> <buffer> <silent> <leader>lf
+        \ :<C-u>call <SID>RemoteGF()<CR>
+
 " }}}
 
 " vim: fdm=marker
