@@ -60,5 +60,8 @@ syntax match logbuchAuthor /[a-zA-Z\ ]\+<.*>$/ conceal transparent cchar=☺
 			\ contained
 " }}}
 
+" Default fold level: collapse inidiviual bullet points
+set foldlevel=1
+
 let b:current_syntax = 'logbuch'
 " vim: set fdm=marker foldlevel=0:
