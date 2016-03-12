@@ -26,8 +26,12 @@ function! s:NextLog(type, backwards, visual)
 endfunction
 
 function! s:NewLog()
-	let l:author = expand("$EMAIL")
 	let l:gerdate = strftime("%d.%m.%Y")
+	let l:author = expand("$EMAIL")
+	" For author information $EMAIL is preferred with $USER as a fallback.
+	if l:author == "$EMAIL"
+		let l:author = expand("$USER")
+	endif
 	" find first log entry
 	execute "silent normal! gg"
 	call <SID>NextLog(1, 0, 0)
