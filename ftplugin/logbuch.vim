@@ -5,26 +5,24 @@ scriptencoding utf-8
 let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
 
 function! s:NextLog(type, backwards, visual)
-
 	let vcount = v:count1
-
     if a:visual
         normal! gv
     endif
-
     if a:type == 1
 		let pattern = s:dateline_pattern
     elseif a:type == 2
         let pattern = '^\*\ '
     endif
-
     if a:backwards
-        let dir = '?'
+        let dir = 'b'
     else
-        let dir = '/'
+        let dir = ''
     endif
-
-	execute 'silent normal! ' . vcount . dir . pattern . dir . "\r"
+	while vcount > 0
+		call search(pattern, "sW" . dir)
+		let vcount -= 1
+	endwhile
 endfunction
 
 function! s:NewLog()
