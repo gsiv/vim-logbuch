@@ -1,5 +1,9 @@
 scriptencoding utf-8
 " {{{ Functions
+
+" Pattern that matches beginnings of new logbuch entries
+let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
+
 function! s:NextLog(type, backwards, visual)
 
 	let vcount = v:count1
@@ -9,7 +13,7 @@ function! s:NextLog(type, backwards, visual)
     endif
 
     if a:type == 1
-		let pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
+		let pattern = s:dateline_pattern
     elseif a:type == 2
         let pattern = '^\*\ '
     endif
@@ -73,11 +77,11 @@ function! s:SetMarker()
 	let wsv = winsaveview()
 	call append(line('.')-1, marker)
 	" Delete previous markers
-	silent execute "?^[0-3]?,.-2g/" . marker . "/d"
+	silent execute "?" . s:dateline_pattern . "?,.-2g/" . marker . "/d"
 	call winrestview(wsv)
 	let wsv = winsaveview()
 	" Delete following markers
-	silent execute ".+1,/^[0-3]/-1g/" . marker . "/d"
+	silent execute ".+1,/" . s:dateline_pattern . "/-1g/" . marker . "/d"
 	call winrestview(wsv)
 endfunction
 
