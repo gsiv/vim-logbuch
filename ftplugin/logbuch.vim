@@ -64,6 +64,23 @@ function! s:NetrwPrompt()
 	exe input("", "edit " . netrw_host)
 endfunction
 
+function! s:SetMarker()
+	" Set a TODO marker line and remove other marker lines within the current
+	" logbuch entry.
+	" The deletions happen separately because it is easier to restore the
+	" cursors expected position this way.
+	let marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
+	let wsv = winsaveview()
+	call append(line('.')-1, marker)
+	" Delete previous markers
+	silent execute "?^[0-3]?,.-2g/" . marker . "/d"
+	call winrestview(wsv)
+	let wsv = winsaveview()
+	" Delete following markers
+	silent execute ".+1,/^[0-3]/-1g/" . marker . "/d"
+	call winrestview(wsv)
+endfunction
+
 " }}}
 
 " {{{ Mappings
@@ -107,6 +124,9 @@ noremap <script> <buffer> <silent> <leader>lf
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
 noremap <buffer> <leader>le :call <SID>NetrwPrompt()<CR>
 
+" Set TODO marker line
+noremap <script> <buffer> <silent> <leader>ll
+        \ :<C-u>call <SID>SetMarker()<CR>
 
 " }}}
 

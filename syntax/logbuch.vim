@@ -21,6 +21,7 @@ hi def link   logbuchItemCmd           Statement
 hi def link   logbuchItemComment       Function
 hi def link   logbuchItemBody          Comment
 hi def link   logbuchItemFile          Underlined
+hi def link   logbuchItemMarker        CursorLineNr
 " }}}
 
 " Preamble {{{
@@ -51,6 +52,9 @@ syntax match  logbuchItemBody /^\s\s\+.*$/ contained
 syntax match  logbuchItemComment /#\s.*$/ contained
 " TODO: improve:
 syntax match  logbuchItemFile /\/.*:$/ contained
+syntax match  logbuchItemMarker
+			\ /^\*\sv\sv\sv\sv\sv\sv\sv\sv\sv\sv\sTODO\sv\sv\sv\sv\sv\sv\sv\sv\sv\sv$/
+			\ contained
 
 " date and author
 syntax match logbuchDate /^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t/
