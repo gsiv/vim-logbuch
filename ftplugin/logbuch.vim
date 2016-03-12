@@ -5,45 +5,45 @@ scriptencoding utf-8
 let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
 
 function! s:NextLog(type, backwards, visual)
-	let vcount = v:count1
+	let l:vcount = v:count1
     if a:visual
         normal! gv
     endif
     if a:type == 1
-		let pattern = s:dateline_pattern
+		let l:pattern = s:dateline_pattern
     elseif a:type == 2
-        let pattern = '^\*\ '
+        let l:pattern = '^\*\ '
     endif
     if a:backwards
-        let dir = 'b'
+        let l:dir = 'b'
     else
-        let dir = ''
+        let l:dir = ''
     endif
 	while vcount > 0
-		call search(pattern, "sW" . dir)
-		let vcount -= 1
+		call search(l:pattern, "sW" . l:dir)
+		let l:vcount -= 1
 	endwhile
 endfunction
 
 function! s:NewLog()
-	let author = expand("$EMAIL")
-	let gerdate = strftime("%d.%m.%Y")
+	let l:author = expand("$EMAIL")
+	let l:gerdate = strftime("%d.%m.%Y")
 	" find first log entry
 	execute "silent normal! gg"
 	call <SID>NextLog(1, 0, 0)
 	" insert new log entry header
-	execute "silent normal! O" . gerdate . "\<c-v>\t" . author . "\r"
+	execute "silent normal! O" . l:gerdate . "\<c-v>\t" . l:author . "\r"
 	" insert first bullet point
 	execute "silent normal! O* "
 endfunction
 
 " extact <protocol>://<host> from filename
 function! s:NetrwHost()
-	let filename = expand("%")
-	if filename =~? "^[a-z]\\+://[a-z0-9-\\.]\\+/"
-		let netrw_host = fnamemodify(filename,
+	let l:filename = expand("%")
+	if l:filename =~? "^[a-z]\\+://[a-z0-9-\\.]\\+/"
+		let l:netrw_host = fnamemodify(l:filename,
 					\":s?\\(^scp:\\/\\/[a-zA-Z0-9-\\.]\\+\/\\).*?\\1?")
-		return netrw_host
+		return l:netrw_host
 	endif
 		return ""
 endfunction
@@ -51,10 +51,10 @@ endfunction
 " Open file under cursor; like `:e <cfile>` but open on same host as current
 " file if using netrw
 function! s:RemoteGF()
-	let netrw_host = s:NetrwHost()
+	let l:netrw_host = s:NetrwHost()
 	if netrw_host != ""
-		let linked_file = netrw_host . expand("<cfile>")
-		execute 'edit ' . fnameescape(linked_file)
+		let l:linked_file = l:netrw_host . expand("<cfile>")
+		execute 'edit ' . fnameescape(l:linked_file)
 	else
 		execute 'edit <cfile>'
 	endif
@@ -62,8 +62,8 @@ endfunction
 
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
 function! s:NetrwPrompt()
-	let netrw_host = s:NetrwHost()
-	exe input("", "edit " . netrw_host)
+	let l:netrw_host = s:NetrwHost()
+	execute input("", "edit " . l:netrw_host)
 endfunction
 
 function! s:SetMarker()
@@ -71,16 +71,16 @@ function! s:SetMarker()
 	" logbuch entry.
 	" The deletions happen separately because it is easier to restore the
 	" cursors expected position this way.
-	let marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
-	let wsv = winsaveview()
-	call append(line('.')-1, marker)
+	let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
+	let l:wsv = winsaveview()
+	call append(line('.')-1, l:marker)
 	" Delete previous markers
-	silent execute "?" . s:dateline_pattern . "?,.-2g/" . marker . "/d"
-	call winrestview(wsv)
-	let wsv = winsaveview()
+	silent execute "?" . s:dateline_pattern . "?,.-2g/" . l:marker . "/d"
+	call winrestview(l:wsv)
+	let l:wsv = winsaveview()
 	" Delete following markers
-	silent execute ".+1,/" . s:dateline_pattern . "/-1g/" . marker . "/d"
-	call winrestview(wsv)
+	silent execute ".+1,/" . s:dateline_pattern . "/-1g/" . l:marker . "/d"
+	call winrestview(l:wsv)
 endfunction
 
 " }}}
