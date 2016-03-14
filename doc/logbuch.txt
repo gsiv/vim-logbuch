@@ -10,6 +10,12 @@ INTRODUCTION                                                     *logbuch-intro*
 This plugin provides syntax highlighting and mappings for working with
 logbuch.txt files.
 
+For automatic file type detection, add something like the following
+autocommand to your vimrc: >
+
+    autocmd BufNewFile,BufRead */logbuch.txt set filetype=logbuch
+<
+
 ==============================================================================
 WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
 
