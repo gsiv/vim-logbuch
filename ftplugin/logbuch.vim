@@ -66,9 +66,10 @@ endfunction
 " extact <protocol>://<host> from filename
 function! s:NetrwHost()
 	let l:filename = expand("%")
-	if l:filename =~? "^[a-z]\\+://[a-z0-9-\\.@]\\+/"
+	let l:hostname_pattern = "^[a-z]\\+://[a-z0-9-\\.@]\\+"
+	if l:filename =~? l:hostname_pattern
 		let l:netrw_host = fnamemodify(l:filename,
-					\":s?\\(^scp:\\/\\/[a-zA-Z0-9-\\.@]\\+\/\\).*?\\1?")
+					\":s?\\(" . l:hostname_pattern . "\/\\).*?\\1?")
 		return l:netrw_host
 	endif
 		return ""
