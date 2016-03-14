@@ -57,6 +57,10 @@ function! s:NewLogFromTemplate()
 	execute "normal! P"
 	" insert new log entry header
 	execute "silent normal! C" . l:gerdate . "\<c-v>\t" . l:author
+	" insert marker line
+	" TODO: make this configurable in ~/.vimrc
+	execute "normal! j"
+	call <SID>SetMarker()
 endfunction
 
 " extact <protocol>://<host> from filename
