@@ -19,9 +19,9 @@ autocommand to your vimrc: >
 ==============================================================================
 WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
 
-*\ln*     Create a new logbuch entry as the top-most entry
-*\ll*     Insert a TODO marker at the current position.  There can only be one
-        marker per logbuch entry.
+*<leader>ln*     Create a new logbuch entry as the top-most entry
+*<leader>ll*     Insert a TODO marker at the current position.  There can only
+               be one marker per logbuch entry.
 
 ------------------------------------------------------------------------------
 NAVIGATION                                                  *logbuch-navigation*
@@ -40,9 +40,9 @@ REMOTELY EDITING LOGBUCH FILES                                  *logbuch-remote*
 If the |netrw| plugin is available, Vim can edit logbuch files remotely.
 This plugin extends netrw's functionality.
 
-*\le*    Open an :edit prompt with the remote host part filled in.
-*\lf*    Like *gf* but open the file path under the cursor on the remote
-       machine.
+*<leader>le*    Open an :edit prompt with the remote host part filled in.
+*<leader>lf*    Like *gf* but open the file path under the cursor on the
+              remote machine.
 
 
  vim:tw=78:et:ft=help:norl:
