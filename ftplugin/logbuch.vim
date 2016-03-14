@@ -41,6 +41,24 @@ function! s:NewLog()
 	execute "silent normal! O* "
 endfunction
 
+function! s:NewLogFromTemplate()
+	" Yank an entry, paste it at the top and update the date/author line
+	" TODO: don't change the user's paste registers?
+	let l:gerdate = strftime("%d.%m.%Y")
+	let l:author = expand("$EMAIL")
+	" For author information $EMAIL is preferred with $USER as a fallback.
+	if l:author == "$EMAIL"
+		let l:author = expand("$USER")
+	endif
+	execute "normal! yap"
+	" find first log entry
+	execute "silent normal! gg"
+	call <SID>NextLog(1, 0, 0)
+	execute "normal! P"
+	" insert new log entry header
+	execute "silent normal! C" . l:gerdate . "\<c-v>\t" . l:author
+endfunction
+
 " extact <protocol>://<host> from filename
 function! s:NetrwHost()
 	let l:filename = expand("%")
@@ -121,6 +139,10 @@ vnoremap <script> <buffer> <silent> []
 " New log
 noremap <script> <buffer> <silent> <leader>ln
         \ :<C-u>call <SID>NewLog()<CR>
+" New log from template
+noremap <script> <buffer> <silent> <leader>lN
+        \ :<C-u>call <SID>NewLogFromTemplate()<CR>
+
 
 " Remote Editing:
 " Open file under cursor; like `:e <cfile>` but open on same host as current

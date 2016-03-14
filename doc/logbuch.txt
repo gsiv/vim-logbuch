@@ -20,6 +20,9 @@ autocommand to your vimrc: >
 WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
 
 *<leader>ln*     Create a new logbuch entry as the top-most entry
+*<leader>lN*     Create a new logbuch entry from an existing entry under the
+               cursor.  This will yank an entry and paste it at the top with
+               updated date & author information.
 *<leader>ll*     Insert a TODO marker at the current position.  There can only
                be one marker per logbuch entry.
 
