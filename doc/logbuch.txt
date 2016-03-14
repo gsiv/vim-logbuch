@@ -1,0 +1,42 @@
+*logbuch.txt*  Syntax highlighting and handy mappings for logbuch.txt files
+
+
+Author:  Gernot Schulz <gernot@intevation.de>
+License: TBD
+
+==============================================================================
+INTRODUCTION                                                     *logbuch-intro*
+
+This plugin provides syntax highlighting and mappings for working with
+logbuch.txt files.
+
+==============================================================================
+WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
+
+*\ln*     Create a new logbuch entry as the top-most entry
+*\ll*     Insert a TODO marker at the current position.  There can only be one
+        marker per logbuch entry.
+
+------------------------------------------------------------------------------
+NAVIGATION                                                  *logbuch-navigation*
+
+This plugins provides the following normal and visual mode navigation mappings:
+
+*]]*     Move to next logbuch entry
+*[[*     Move to previous logbuch entry
+*][*     Move to next logbuch bullet point
+*[]*     Move to previous logbuch bullet point
+
+
+------------------------------------------------------------------------------
+REMOTELY EDITING LOGBUCH FILES                                  *logbuch-remote*
+
+If the |netrw| plugin is available, Vim can edit logbuch files remotely.
+This plugin extends netrw's functionality.
+
+*\le*    Open an :edit prompt with the remote host part filled in.
+*\lf*    Like *gf* but open the file path under the cursor on the remote
+       machine.
+
+
+ vim:tw=78:et:ft=help:norl:
