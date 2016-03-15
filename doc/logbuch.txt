@@ -105,4 +105,12 @@ Disabling this feature: >
   let g:logbuch_cfg_template_marker = 0
 <
 
+                                                    *g:logbuch_cfg_marker_below*
+Set whether the TODO marker line should be inserted above or below the current
+line.  The default is to insert above. >
+
+  let g:logbuch_cfg_marker_loc = 'above'
+  let g:logbuch_cfg_marker_loc = 'below'
+<
+
  vim:tw=78:et:ft=help:norl:

@@ -128,20 +128,38 @@ function! s:NetrwPrompt()
 endfunction
 
 function! s:SetMarker()
-    " Set a TODO marker line and remove other marker lines within the current
-    " logbuch entry.
     " The deletions happen separately because it is easier to restore the
     " cursors expected position this way.
-    " TODO: don't modify users' search history
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
+    " Check for user config
+    if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 'below')
+        let l:insert_lnum = line('.')
+    else
+        let l:insert_lnum = line('.') - 1
+    endif
+
     let l:wsv = winsaveview()
-    call append(line('.')-1, l:marker)
-    " Delete previous markers
-    silent execute "?" . s:dateline_pattern . "?,.-2g/" . l:marker . "/d"
+    call append(l:insert_lnum, l:marker)
     call winrestview(l:wsv)
+
     let l:wsv = winsaveview()
-    " Delete following markers
-    silent execute ".+1,/" . s:dateline_pattern . "/-1g/" . l:marker . "/d"
+    " Delete previous markers
+    if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 'below')
+        let l:wsv = winsaveview()
+        silent execute "?" . s:dateline_pattern . "?,.-0g/" . l:marker . "/d"
+        call winrestview(l:wsv)
+        let l:wsv = winsaveview()
+        silent execute ".+2,/" . s:dateline_pattern . "/-1g/" . l:marker . "/d"
+        call winrestview(l:wsv)
+    else
+        " Delete following markers
+        let l:wsv = winsaveview()
+        silent execute "?" . s:dateline_pattern . "?,.-2g/" . l:marker . "/d"
+        call winrestview(l:wsv)
+        let l:wsv = winsaveview()
+        silent execute ".+1,/" . s:dateline_pattern . "/-1g/" . l:marker . "/d"
+        call winrestview(l:wsv)
+    endif
     call winrestview(l:wsv)
 endfunction
 
