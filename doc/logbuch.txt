@@ -47,5 +47,16 @@ This plugin extends netrw's functionality.
 *<leader>lf*    Like *gf* but open the file path under the cursor on the
               remote machine.
 
+==============================================================================
+OPTIONS                                                        *logbuch-options*
+
+                                                 *g:logbuch_cfg_template_marker*
+Choose whether a TODO marker line should be automatically inserted for new
+entries created from templates.
+
+Disabling this feature: >
+
+  let g:logbuch_cfg_template_marker = 0
+<
 
  vim:tw=78:et:ft=help:norl:

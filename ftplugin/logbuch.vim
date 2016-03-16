@@ -60,7 +60,16 @@ function! s:NewLogFromTemplate()
 	" insert marker line
 	" TODO: make this configurable in ~/.vimrc
 	execute "normal! j"
-	call <SID>SetMarker()
+	" Insert marker line (default: yes)
+	if exists("g:logbuch_cfg_template_marker")
+		" if not disabled by user
+		if g:logbuch_cfg_template_marker != 0
+			call <SID>SetMarker()
+		endif
+	else
+		" if no preference configured
+		call <SID>SetMarker()
+	endif
 endfunction
 
 " extact <protocol>://<host> from filename
