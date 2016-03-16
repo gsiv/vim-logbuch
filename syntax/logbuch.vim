@@ -1,4 +1,11 @@
 scriptencoding utf-8
+
+" TODO:
+" - considering empty lines as logbuch entry boundries is not strictly
+"   correct; it should be empty lines which aren't followed by a new bullet
+"   point or date/author line
+" - folding gets confused with asterisks in body text
+
 if exists('b:current_syntax') | finish |  endif
 
 syntax clear
