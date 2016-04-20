@@ -22,7 +22,6 @@ hi def link   logbuchDate              Title
 hi def link   logbuchPreambleItem      PreProc
 hi def link   logbuchPreambleSection   Todo
 hi def link   logbuchTitleHostname     ErrorMsg
-hi def link   logbuchTitleHostnameXen  ErrorMsg
 hi def link   logbuchTitleIP           Number
 hi def link   logbuchItemBullet        String
 hi def link   logbuchItemCmd           Statement
@@ -35,7 +34,7 @@ hi def link   logbuchItemMarker        CursorLineNr
 " Preamble {{{
 syntax region logbuchPreamble start=/^Logbuch\ \(fuer\|mit\)/
 			\ end=/^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t/me=s-1 transparent
-			\ contains=logbuchTitleHostname,logbuchTitleHostnameXen,logbuchTitleIP,logbuchPreambleEntry
+			\ contains=logbuchTitleHostname,logbuchTitleIP,logbuchPreambleEntry
 syntax match  logbuchPreambleSection /^[A-Z]\+:$/ contained
 syntax region logbuchPreambleEntry start=/^[A-Z]\+:$/ end=/^[A-Z]/me=s-1
 			\ end=/^$/me=s-1 transparent contained
@@ -43,11 +42,11 @@ syntax region logbuchPreambleEntry start=/^[A-Z]\+:$/ end=/^[A-Z]/me=s-1
 " optional: fold:
 syntax region logbuchPreambleItem start=/^\*\s/ end=/^\*\s/me=s-1
 			\ end=/^$/me=s-1 contained
-syntax region logbuchTitleHostname start=/^Logbuch\ fuer\ /ms=e+1
-			\ end=/\ (/me=s-1 end=/$/  contained
-syntax region logbuchTitleHostnameXen
+syntax region logbuchTitleHostname
+			\ start=/^Logbuch\ fuer\ /ms=e+1
 			\ start=/^Logbuch\ mit\ Änderungen\ für\ die\ virtuellen\ Instanzen\ auf\ /ms=e+1
-			\ end=/\.$/me=s-1 end=/$/  contained
+			\ end=/\.$/me=s-1 end=/$/
+			\ end=/\ (/me=s-1 end=/$/  contained
 syntax region logbuchTitleIP start=/(/ms=e+1 end=/)/me=s-1 contained
 " }}}
 
