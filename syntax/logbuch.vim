@@ -61,7 +61,7 @@ syntax match  logbuchItemBody /^\s\s\+.*$/ contained
 			\ contains=logbuchItemComment,logbuchItemFile
 syntax match  logbuchItemComment /#\s.*$/ contained
 " TODO: improve:
-syntax match  logbuchItemFile /\/.*:$/ contained
+syntax match  logbuchItemFile /[~\/\.]\+.\+:$/ contained
 syntax match  logbuchItemMarker
 			\ /^\*\sv\sv\sv\sv\sv\sv\sv\sv\sv\sv\sTODO\sv\sv\sv\sv\sv\sv\sv\sv\sv\sv$/
 			\ contained
