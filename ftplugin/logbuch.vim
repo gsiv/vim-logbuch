@@ -1,4 +1,8 @@
 scriptencoding utf-8
+
+setlocal foldmethod=expr
+setlocal foldtext=LogbuchFold(v:lnum) " in ftplugin
+
 " {{{ Functions
 
 " Pattern that matches beginnings of new logbuch entries
@@ -119,6 +123,33 @@ function! s:SetMarker()
 	call winrestview(l:wsv)
 endfunction
 
+function! LogbuchFold(lnum)
+	let foldchar = matchstr(&fillchars, 'fold:\zs.')
+	if v:foldlevel == 1
+		" Formatting for completely collapsed entries
+		" This gives a summary of the entry's header (date, author)
+		" plus the first line of the entry itself
+		let headline = getline(v:foldstart)
+		let date = matchstr(headline, '[0-9\.]\+')
+		" let author = matchstr(headline, '[a-zA-Z-\ ]\+\ze\ <') " full name
+		let author = matchstr(headline, '\zs[a-zA-Z-]\+\ze\ ') " first name
+		let email = matchstr(headline, '<.*>')
+		let content_line = getline(v:foldstart + 1)
+		let content_line = substitute(content_line, '\s*\*\s', '', '')
+		let line = printf('%s - %s - %s', date, author, content_line)
+	else
+		" default
+		let line = substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
+	endif
+	let lines_count = v:foldend - v:foldstart + 1
+	let lines_count_text = printf(" %s lines", lines_count)
+	let summary_line = strpart(line, 0, (winwidth(0)*2)/3) " cut line at 2/3 of window width
+	" length of sting(s) that will have to fit on screen
+	let foldtextlength = strlen(substitute(summary_line . lines_count_text,
+				\'.', 'x', 'g')) + &foldcolumn
+	let foldtextlength = foldtextlength + 4 " No idea why we need to add 4 here!
+	return summary_line . repeat(foldchar, winwidth(0)-foldtextlength) . lines_count_text
+endfunction
 " }}}
 
 " {{{ Mappings
