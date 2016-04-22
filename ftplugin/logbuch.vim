@@ -64,6 +64,8 @@ function! s:NewLogFromTemplate()
 	" insert new log entry header
 	" TODO: use vim function
 	execute "silent normal! C" . l:gerdate . "\<c-v>\t" . l:author
+	" fully unfold
+	execute "silent normal! zCzO"
 	" insert marker line
 	" TODO: make this configurable in ~/.vimrc
 	execute "normal! j"
