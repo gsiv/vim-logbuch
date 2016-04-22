@@ -19,22 +19,33 @@ autocommand to your vimrc: >
 ==============================================================================
 WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
 
-*<leader>o*      Create a new logbuch entry as the top-most entry
-*<leader>O*      Create a new logbuch entry from an existing entry under the
-               cursor.  This will yank an entry and paste it at the top with
-               updated date & author information.
-*<leader>ll*     Insert a TODO marker at the current position.  There can only
-               be one marker per logbuch entry.
+Default key mappings:
+
+*<leader>o*                                                  <Plug>(logbuch-new)
+        Create a new logbuch entry as the top-most entry
+
+*<leader>O*                                    <Plug>(logbuch-new-from-template)
+        Create a new logbuch entry from an existing entry under the cursor.
+        This will yank an entry and paste it at the top with updated date
+        & author information.
+
+*<leader>ll*                                         <Plug>(logbuch-todo-marker)
+        Insert a TODO marker at the current position.  There can only be one
+        marker per logbuch entry.
 
 ------------------------------------------------------------------------------
 NAVIGATION                                                  *logbuch-navigation*
 
 This plugins provides the following normal and visual mode navigation mappings:
 
-*]]*     Move to next logbuch entry
-*[[*     Move to previous logbuch entry
-*][*     Move to next logbuch bullet point
-*[]*     Move to previous logbuch bullet point
+*]]*                                                <Plug>(logbuch-next-section)
+        Move to next logbuch entry
+*[[*                                                <Plug>(logbuch-prev-section)
+        Move to previous logbuch entry
+*][*                                             <Plug>(logbuch-next-subsection)
+        Move to next logbuch bullet point
+*[]*                                             <Plug>(logbuch-prev-subsection)
+        Move to previous logbuch bullet point
 
 
 ------------------------------------------------------------------------------
@@ -43,12 +54,24 @@ REMOTELY EDITING LOGBUCH FILES                                  *logbuch-remote*
 If the |netrw| plugin is available, Vim can edit logbuch files remotely.
 This plugin extends netrw's functionality.
 
-*<leader>ge*    Open an :edit prompt with the remote host part filled in.
-*<leader>gf*    Like *gf* but open the file path under the cursor on the
-              remote machine.
+*<leader>ge*                                  <Plug>(logbuch-remote-edit-prompt)
+        Open an :edit prompt with the remote host part filled in.
+
+*<leader>gf*                                           <Plug>(logbuch-remote-gf)
+        Like *gf* but open the file path under the cursor on the remote
+        machine.
 
 ==============================================================================
 OPTIONS                                                        *logbuch-options*
+
+                                                      *g:logbuch_cfg_no_mapping*
+Disable the above default key mappings by setting this variable to 1.
+Custom mappings can be configured using the <Plug> interface.
+
+Disable all pre-defined key mappings: >
+
+  let g:logbuch_cfg_no_mapping = 1
+<
 
                                                  *g:logbuch_cfg_template_marker*
 Choose whether a TODO marker line should be automatically inserted for new
