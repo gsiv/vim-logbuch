@@ -157,56 +157,80 @@ function! LogbuchFold(lnum)
 endfunction
 " }}}
 
-" {{{ Mappings
+" {{{ <Plug> Mappings
 " Navigation: Normal mode
 "  logbuch entry date lines
-noremap <script> <buffer> <silent> ]]
+" ]]
+noremap <script> <buffer> <silent> <Plug>(logbuch-next-section)
         \ :<C-u>call <SID>NextLog(1, 0, 0)<CR>
 
-noremap <script> <buffer> <silent> [[
+" [[
+noremap <script> <buffer> <silent> <Plug>(logbuch-prev-section)
         \ :<C-u>call <SID>NextLog(1, 1, 0)<CR>
 
 "  logbuch bullet point lines
-noremap <script> <buffer> <silent> ][
+" ][
+noremap <script> <buffer> <silent> <Plug>(logbuch-next-subsection)
         \ :<C-u>call <SID>NextLog(2, 0, 0)<CR>
 
-noremap <script> <buffer> <silent> []
+" []
+noremap <script> <buffer> <silent> <Plug>(logbuch-prev-subsection)
         \ :<C-u>call <SID>NextLog(2, 1, 0)<CR>
 
 " Navigation: Visual mode
-vnoremap <script> <buffer> <silent> ]]
+" ]]
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-next-section)
         \ :<C-u>call <SID>NextLog(1, 0, 1)<CR>
 
-vnoremap <script> <buffer> <silent> [[
+" [[
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-prev-section)
         \ :<C-u>call <SID>NextLog(1, 1, 1)<CR>
 
-vnoremap <script> <buffer> <silent> ][
+" ][
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-next-subsection)
         \ :<C-u>call <SID>NextLog(2, 0, 1)<CR>
 
-vnoremap <script> <buffer> <silent> []
+" []
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-prev-subsection)
         \ :<C-u>call <SID>NextLog(2, 1, 1)<CR>
 
 " New log
-noremap <script> <buffer> <silent> <leader>o
+noremap <script> <buffer> <silent> <Plug>(logbuch-new)
         \ :<C-u>call <SID>NewLog()<CR>
 " New log from template
-noremap <script> <buffer> <silent> <leader>O
+noremap <script> <buffer> <silent> <Plug>(logbuch-new-from-template)
         \ :<C-u>call <SID>NewLogFromTemplate()<CR>
 
 
 " Remote Editing:
 " Open file under cursor; like `:e <cfile>` but open on same host as current
 " file if using netrw
-noremap <script> <buffer> <silent> <leader>gf
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-gf)
         \ :<C-u>call <SID>RemoteGF()<CR>
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
-noremap <script> <buffer> <silent> <leader>ge
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
 		\ :<C-u>call <SID>NetrwPrompt()<CR>
 
 " Set TODO marker line
-noremap <script> <buffer> <silent> <leader>ll
+noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker)
         \ :<C-u>call <SID>SetMarker()<CR>
 
+" }}}
+
+" {{{ Default mappings
+
+silent execute 'map ]]        <Plug>(logbuch-next-section)'
+silent execute 'map [[        <Plug>(logbuch-prev-section)'
+silent execute 'map ][        <Plug>(logbuch-next-subsection)'
+silent execute 'map []        <Plug>(logbuch-prev-subsection)'
+
+silent execute 'map <leader>o <Plug>(logbuch-new)'
+silent execute 'map <leader>O <Plug>(logbuch-new-from-template)'
+
+silent execute 'map <leader>gf <Plug>(logbuch-remote-gf)'
+silent execute 'map <leader>ge <Plug>(logbuch-remote-edit-prompt)'
+
+silent execute 'nmap <leader>ll <Plug>(logbuch-todo-marker)'
 " }}}
 
 " vim: fdm=marker
