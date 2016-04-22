@@ -187,20 +187,21 @@ vnoremap <script> <buffer> <silent> []
         \ :<C-u>call <SID>NextLog(2, 1, 1)<CR>
 
 " New log
-noremap <script> <buffer> <silent> <leader>ln
+noremap <script> <buffer> <silent> <leader>o
         \ :<C-u>call <SID>NewLog()<CR>
 " New log from template
-noremap <script> <buffer> <silent> <leader>lN
+noremap <script> <buffer> <silent> <leader>O
         \ :<C-u>call <SID>NewLogFromTemplate()<CR>
 
 
 " Remote Editing:
 " Open file under cursor; like `:e <cfile>` but open on same host as current
 " file if using netrw
-noremap <script> <buffer> <silent> <leader>lf
+noremap <script> <buffer> <silent> <leader>gf
         \ :<C-u>call <SID>RemoteGF()<CR>
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
-noremap <buffer> <leader>le :call <SID>NetrwPrompt()<CR>
+noremap <script> <buffer> <silent> <leader>ge
+		\ :<C-u>call <SID>NetrwPrompt()<CR>
 
 " Set TODO marker line
 noremap <script> <buffer> <silent> <leader>ll
