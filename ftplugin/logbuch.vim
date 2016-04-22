@@ -59,7 +59,10 @@ function! s:NewLogFromTemplate()
 	execute "silent normal! gg"
 	call <SID>NextLog(1, 0, 0)
 	execute "normal! P"
+	" unfold to enable next normal command
+	execute "silent normal! zO"
 	" insert new log entry header
+	" TODO: use vim function
 	execute "silent normal! C" . l:gerdate . "\<c-v>\t" . l:author
 	" insert marker line
 	" TODO: make this configurable in ~/.vimrc
