@@ -218,19 +218,30 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker)
 " }}}
 
 " {{{ Default mappings
+"
+function! s:set_default_key_maps()
+	silent execute 'map ]]          <Plug>(logbuch-next-section)'
+	silent execute 'map [[          <Plug>(logbuch-prev-section)'
+	silent execute 'map ][          <Plug>(logbuch-next-subsection)'
+	silent execute 'map []          <Plug>(logbuch-prev-subsection)'
 
-silent execute 'map ]]        <Plug>(logbuch-next-section)'
-silent execute 'map [[        <Plug>(logbuch-prev-section)'
-silent execute 'map ][        <Plug>(logbuch-next-subsection)'
-silent execute 'map []        <Plug>(logbuch-prev-subsection)'
+	silent execute 'map <leader>o   <Plug>(logbuch-new)'
+	silent execute 'map <leader>O   <Plug>(logbuch-new-from-template)'
 
-silent execute 'map <leader>o <Plug>(logbuch-new)'
-silent execute 'map <leader>O <Plug>(logbuch-new-from-template)'
+	silent execute 'map <leader>gf  <Plug>(logbuch-remote-gf)'
+	silent execute 'map <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
-silent execute 'map <leader>gf <Plug>(logbuch-remote-gf)'
-silent execute 'map <leader>ge <Plug>(logbuch-remote-edit-prompt)'
+	silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker)'
+endfunction
 
-silent execute 'nmap <leader>ll <Plug>(logbuch-todo-marker)'
+if exists("g:logbuch_cfg_no_mapping")
+	" if not disabled by user
+	if g:logbuch_cfg_no_mapping != 1
+		call s:set_default_key_maps()
+	endif
+else
+	call s:set_default_key_maps()
+endif
 " }}}
 
 " vim: fdm=marker
