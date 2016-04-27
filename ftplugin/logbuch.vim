@@ -48,13 +48,23 @@ endfunction
 function! s:NewLogFromTemplate()
     " Yank an entry, paste it at the top and update the date/author line
     " TODO: don't change the user's paste registers?
+    " TODO: use vim functions instead of normal mode
     let l:gerdate = strftime("%d.%m.%Y")
     let l:author = expand("$EMAIL")
     " For author information $EMAIL is preferred with $USER as a fallback.
     if l:author == "$EMAIL"
         let l:author = expand("$USER")
     endif
-    execute "normal! yap"
+    if getline('.') !~? s:dateline_pattern
+        " go back to this entries header
+        call <SID>NextLog(1, 1, 0)
+    endif
+    " select until next entry
+    execute "normal! V"
+    call <SID>NextLog(1, 0, 0)
+    execute "normal! k"
+    " yank
+    execute "normal! y"
     " find first log entry
     execute "silent normal! gg"
     call <SID>NextLog(1, 0, 0)
@@ -62,12 +72,10 @@ function! s:NewLogFromTemplate()
     " unfold to enable next normal command
     execute "silent normal! zO"
     " insert new log entry header
-    " TODO: use vim function
     execute "silent normal! C" . l:gerdate . "\<c-v>\t" . l:author
     " fully unfold
     execute "silent normal! zCzO"
     " insert marker line
-    " TODO: make this configurable in ~/.vimrc
     execute "normal! j"
     " Insert marker line (default: yes)
     if exists("g:logbuch_cfg_template_marker")
