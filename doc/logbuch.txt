@@ -33,6 +33,23 @@ Default key mappings:
         Insert a TODO marker at the current position.  There can only be one
         marker per logbuch entry.
 
+*<leader>lv*                                    <Plug>(logbuch-modify-selection)
+
+        When visually selecting a logbuch entry that starts with an asterisk,
+        modify the selection to exclude it.
+
+        This enables you to copy only the executable part of entries such as
+        the following while still using quick linewise selections.
+
+          * /bin/ls /home \
+            /etc          \
+            /usr
+
+        Additionally, the final newline will be excluded from the selection,
+        so in some cases (e.g., as with the above example) the command will
+        not be automatically executed after pasting it into a terminal
+        emulator.
+
 ------------------------------------------------------------------------------
 NAVIGATION                                                  *logbuch-navigation*
 

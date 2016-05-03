@@ -172,6 +172,29 @@ function! LogbuchFold(lnum)
     let foldtextlength = foldtextlength + 4 " No idea why we need to add 4 here!
     return summary_line . repeat(foldchar, winwidth(0)-foldtextlength) . lines_count_text
 endfunction
+
+function! s:ModifyVisualSelection()
+    " Try to make a visual selection pastable by removing leading asterisks.
+    " Also remove the final line break to avoid executing commands in the
+    " shell.
+    " TODO: avoid normal mode?
+    let start_pos = getpos('v')
+    let end_pos   = getpos("'>")
+    " move to beginning of selection
+    call setpos('.', start_pos)
+    let line = getline('.')
+    " Match logbuch entry bullet points ("* ")
+    if line =~ "^\\*\\ "
+        " - move 2 to exclude the bullet point
+        execute "normal! 2l"
+    endif
+    " - visually select until previous end of selection
+    execute "normal! v"
+    call setpos('.', end_pos)
+    " - move back 1 column to exclude newline
+    execute "normal! $h"
+endfunction
+
 " }}}
 
 " {{{ <Plug> Mappings
@@ -232,6 +255,10 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
 noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker)
         \ :<C-u>call <SID>SetMarker()<CR>
 
+" Modify visual selection
+noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
+        \ :<C-u>call <SID>ModifyVisualSelection()<CR>
+
 " }}}
 
 " {{{ Default mappings
@@ -249,6 +276,7 @@ function! s:set_default_key_maps()
     silent execute 'map <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
     silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker)'
+    silent execute 'map <leader>lv  <Plug>(logbuch-modify-selection)'
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")
