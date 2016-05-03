@@ -24,9 +24,11 @@ function! s:NextLog(type, backwards, visual)
         let l:dir = ''
     endif
     while vcount > 0
-        call search(l:pattern, "sW" . l:dir)
+        let next_entry_lnum = searchpos(l:pattern, "sW" . l:dir)[0]
         let l:vcount -= 1
     endwhile
+    call setpos('.', [0, next_entry_lnum, 0, 0])
+endfunction
 endfunction
 
 function! s:NewLog()
