@@ -29,6 +29,12 @@ function! s:NextLog(type, backwards, visual)
     endwhile
     call setpos('.', [0, next_entry_lnum, 0, 0])
 endfunction
+
+function! s:GoToFirstLog()
+    " Go to beginning of file
+    call setpos('.', [0, 0, 0, 0])
+    " Go to beginning first log entry
+    call <SID>NextLog(1, 0, 0)
 endfunction
 
 function! s:NewLog()
@@ -38,9 +44,7 @@ function! s:NewLog()
     if l:author == "$EMAIL"
         let l:author = expand("$USER")
     endif
-    " find first log entry
-    execute "silent normal! gg"
-    call <SID>NextLog(1, 0, 0)
+    call <SID>GoToFirstLog()
     " insert new log entry header
     execute "silent normal! O" . l:gerdate . "\<c-v>\t" . l:author . "\r"
     " insert first bullet point
@@ -68,17 +72,9 @@ function! s:NewLogFromTemplate()
         call add(template_lines, getline(walk_lnum))
         let walk_lnum += 1
     endwhile
-    " Debug
-    " for line in template_lines
-    "     echom line
-    " endfor
-    " Find paste location
-    " find first log entry (duplicated from NewLog())
-    " TODO avoid normal
-    execute "silent normal! gg"
-    call <SID>NextLog(1, 0, 0)
-    " TODO: make function
+    call <SID>GoToFirstLog()
     " insert new log entry header
+    " TODO: make function
     let insert_at_lnum = line('.') - 1
     call append (insert_at_lnum + 0, l:gerdate . "\t" . l:author)
     " insert copied entry
