@@ -46,40 +46,48 @@ function! s:NewLog()
 endfunction
 
 function! s:NewLogFromTemplate()
-    " Yank an entry, paste it at the top and update the date/author line
-    " TODO: don't change the user's paste registers?
-    " TODO: use vim functions instead of normal mode
+    " Copy the entry under the cursor and paste it at the top with an
+    " up-to-date date/author header
     let l:gerdate = strftime("%d.%m.%Y")
     let l:author = expand("$EMAIL")
     " For author information $EMAIL is preferred with $USER as a fallback.
     if l:author == "$EMAIL"
         let l:author = expand("$USER")
     endif
-    " Workaround: fully unfold entry to be copied
-    execute "normal! zO"
     if getline('.') !~? s:dateline_pattern
         " if not already there go back to this entry's header
         call <SID>NextLog(1, 1, 0)
     endif
-    " select until next entry
-    execute "normal! V"
-    call <SID>NextLog(1, 0, 0)
-    execute "normal! k"
-    " yank
-    execute "normal! y"
-    " find first log entry
+    let template_lines = []
+    let start_lnum = line('.')
+    let walk_lnum = start_lnum + 1
+    " while line is not the next entry header
+    while getline(walk_lnum) !~? s:dateline_pattern
+        call add(template_lines, getline(walk_lnum))
+        let walk_lnum += 1
+    endwhile
+    " Debug
+    " for line in template_lines
+    "     echom line
+    " endfor
+    " Find paste location
+    " find first log entry (duplicated from NewLog())
+    " TODO avoid normal
     execute "silent normal! gg"
     call <SID>NextLog(1, 0, 0)
-    execute "normal! P"
-    " unfold to enable next normal command
-    execute "silent normal! zO"
+    " TODO: make function
     " insert new log entry header
-    execute "silent normal! C" . l:gerdate . "\<c-v>\t" . l:author
-    " fully unfold
-    execute "silent normal! zCzO"
-    " insert marker line
-    execute "normal! j"
-    " Insert marker line (default: yes)
+    let insert_at_lnum = line('.') - 1
+    call append (insert_at_lnum + 0, l:gerdate . "\t" . l:author)
+    " insert copied entry
+    call append(insert_at_lnum + 1, template_lines)
+    " Go back to previous entry, i.e., the newly created entry
+    call <SID>NextLog(1, 1, 0)
+    " update folds, then fully unfold new entry
+    execute "silent normal! zxzCzO"
+    " Move one line down
+    call setpos('.', [0, line('.') + 1, 0, 0])
+    " (Maybe) insert TODO marker
     if exists("g:logbuch_cfg_template_marker")
         " if not disabled by user
         if g:logbuch_cfg_template_marker != 0
@@ -126,6 +134,7 @@ function! s:SetMarker()
     " logbuch entry.
     " The deletions happen separately because it is easier to restore the
     " cursors expected position this way.
+    " TODO: don't modify users' search history
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
     let l:wsv = winsaveview()
     call append(line('.')-1, l:marker)
