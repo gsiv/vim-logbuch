@@ -50,6 +50,12 @@ Default key mappings:
         not be automatically executed after pasting it into a terminal
         emulator.
 
+        For workflows with frequent copy & paste, a key mapping like the
+        following might come in handy: >
+
+          map <leader>lc <Plug>(logbuch-modify-selection)"*y
+<
+
 ------------------------------------------------------------------------------
 NAVIGATION                                                  *logbuch-navigation*
 
