@@ -55,8 +55,10 @@ function! s:NewLogFromTemplate()
     if l:author == "$EMAIL"
         let l:author = expand("$USER")
     endif
+    " Workaround: fully unfold entry to be copied
+    execute "normal! zO"
     if getline('.') !~? s:dateline_pattern
-        " go back to this entries header
+        " if not already there go back to this entry's header
         call <SID>NextLog(1, 1, 0)
     endif
     " select until next entry
