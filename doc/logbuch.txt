@@ -29,7 +29,8 @@ Default key mappings:
         This will yank an entry and paste it at the top with updated date
         & author information.
 
-*<leader>ll*                                         <Plug>(logbuch-todo-marker)
+*<leader>ll*                                   <Plug>(logbuch-todo-marker-above)
+                                             <Plug>(logbuch-todo-marker-below)
         Insert a TODO marker at the current position.  There can only be one
         marker per logbuch entry.
 
@@ -109,8 +110,7 @@ Disabling this feature: >
 Set whether the TODO marker line should be inserted above or below the current
 line.  The default is to insert above. >
 
-  let g:logbuch_cfg_marker_loc = 'above'
-  let g:logbuch_cfg_marker_loc = 'below'
+  let g:logbuch_cfg_marker_below = 1
 <
 
  vim:tw=78:et:ft=help:norl:

@@ -89,11 +89,11 @@ function! s:NewLogFromTemplate()
     if exists("g:logbuch_cfg_template_marker")
         " if not disabled by user
         if g:logbuch_cfg_template_marker != 0
-            call <SID>SetMarker()
+            call <SID>SetMarker(0)
         endif
     else
         " if no preference configured
-        call <SID>SetMarker()
+        call <SID>SetMarker(0)
     endif
 endfunction
 
@@ -127,24 +127,15 @@ function! s:NetrwPrompt()
     execute input("", "edit " . l:netrw_host)
 endfunction
 
-function! s:SetMarker(...)
+function! s:SetMarker(pos)
     " The deletions happen separately because it is easier to restore the
     " cursors expected position this way.
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
-    let l:opt_insert_below = 0 " Set default marker insert position to 'above'
-    " Check for user config
-    if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 'below')
+    if a:pos == 1
         let l:opt_insert_below = 1
-    endif
-    " If option is set through function argument, override the global setting.
-    if a:0 > 0
-        if a:1 == "below"
-            let l:opt_insert_below = 1
-        endif
-    endif
-    if l:opt_insert_below == 1
         let l:insert_lnum = line('.')
     else
+        let l:opt_insert_below = 0
         let l:insert_lnum = line('.') - 1
     endif
 
@@ -279,9 +270,11 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-remote-gf)
 noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
         \ :<C-u>call <SID>NetrwPrompt()<CR>
 
-" Set TODO marker line
-noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker)
-        \ :<C-u>call <SID>SetMarker()<CR>
+" Set marker line
+noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
+        \ :<C-u>call <SID>SetMarker(0)<CR>
+noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-below)
+        \ :<C-u>call <SID>SetMarker(1)<CR>
 
 " Modify visual selection
 noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
@@ -303,8 +296,13 @@ function! s:set_default_key_maps()
     silent execute 'map <leader>gf  <Plug>(logbuch-remote-gf)'
     silent execute 'map <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
-    silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker)'
     silent execute 'map <leader>lv  <Plug>(logbuch-modify-selection)'
+    " user config dependend mappings
+    if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 1)
+        silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-below)'
+    else
+        silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-above)'
+    endif
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")
