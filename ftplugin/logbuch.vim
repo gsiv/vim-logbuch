@@ -127,12 +127,22 @@ function! s:NetrwPrompt()
     execute input("", "edit " . l:netrw_host)
 endfunction
 
-function! s:SetMarker()
+function! s:SetMarker(...)
     " The deletions happen separately because it is easier to restore the
     " cursors expected position this way.
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
+    let l:opt_insert_below = 0 " Set default marker insert position to 'above'
     " Check for user config
     if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 'below')
+        let l:opt_insert_below = 1
+    endif
+    " If option is set through function argument, override the global setting.
+    if a:0 > 0
+        if a:1 == "below"
+            let l:opt_insert_below = 1
+        endif
+    endif
+    if l:opt_insert_below == 1
         let l:insert_lnum = line('.')
     else
         let l:insert_lnum = line('.') - 1
@@ -144,7 +154,7 @@ function! s:SetMarker()
 
     let l:wsv = winsaveview()
     " Delete previous markers
-    if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 'below')
+    if l:opt_insert_below == 1
         let l:wsv = winsaveview()
         silent execute "?" . s:dateline_pattern . "?,.-0g/" . l:marker . "/d"
         call winrestview(l:wsv)
