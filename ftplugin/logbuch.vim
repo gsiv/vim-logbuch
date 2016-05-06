@@ -297,12 +297,7 @@ function! s:set_default_key_maps()
     silent execute 'map <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
     silent execute 'map <leader>lv  <Plug>(logbuch-modify-selection)'
-    " user config dependend mappings
-    if (exists("g:logbuch_cfg_marker_below") && g:logbuch_cfg_marker_below == 1)
-        silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-below)'
-    else
-        silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-above)'
-    endif
+    silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-above)'
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")
