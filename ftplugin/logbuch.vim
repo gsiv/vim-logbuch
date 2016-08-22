@@ -100,7 +100,8 @@ endfunction
 " extact <protocol>://<host> from filename
 function! s:NetrwHost()
     let l:filename = expand("%")
-    let l:hostname_pattern = "^[a-z]\\+://[a-z0-9-\\.@]\\+"
+    " hostname pattern:       | protocol |   hostname    |optional port |
+    let l:hostname_pattern = "^[a-z]\\+://[a-z0-9-\\.@]\\+\\(:[0-9]\\+\\)*"
     if l:filename =~? l:hostname_pattern
         let l:netrw_host = fnamemodify(l:filename,
                     \":s?\\(" . l:hostname_pattern . "\/\\).*?\\1?")
