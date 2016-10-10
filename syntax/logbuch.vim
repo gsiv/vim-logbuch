@@ -70,7 +70,8 @@ syntax match  logbuchItemMarker
 syntax match logbuchDate /^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t/
             \ nextgroup=logbuchAuthor contained
 " conceal author name
-syntax match logbuchAuthor /[a-zA-Z\ ]\+<.*>$/ conceal transparent cchar=☺
+syntax match logbuchAuthor /[^<]\+/ contained nextgroup=logbuchEmail
+syntax match logbuchEmail /<.\+>/ conceal transparent cchar=@
             \ contained
 " }}}
 
