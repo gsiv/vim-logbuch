@@ -32,8 +32,8 @@ hi def link   logbuchItemMarker        CursorLineNr
 syntax region logbuchPreamble start=/^Logbuch\ \(fuer\|mit\)/
             \ end=/^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t/me=s-1 transparent
             \ contains=logbuchTitleHostname,logbuchTitleIP,logbuchPreambleEntry
-syntax match  logbuchPreambleSection /^[A-Z]\+:$/ contained
-syntax region logbuchPreambleEntry start=/^[A-Z]\+:$/ end=/^[A-Z]/me=s-1
+syntax match  logbuchPreambleSection /^[0-9A-Z][0-9A-Z\ ]\+:$/ contained
+syntax region logbuchPreambleEntry start=/^[0-9A-Z][0-9A-Z\ ]\+:$/ end=/^[A-Z]/me=s-1
             \ end=/^$/me=s-1 transparent contained
             \ contains=logbuchPreambleSection,logbuchPreambleItem
 " optional: fold:
