@@ -10,6 +10,9 @@ syntax sync fromstart
 
 setlocal expandtab shiftwidth=2 tabstop=2
 setlocal foldmethod=syntax
+" Treat asterisks as regular list bullets, not multi-line comment prefixes
+setlocal comments-=mb:*
+setlocal comments+=fb:*
 if v:version > 703
     setlocal conceallevel=2
 endif
