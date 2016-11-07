@@ -8,7 +8,7 @@ if exists('b:current_syntax') | finish |  endif
 syntax clear
 syntax sync fromstart
 
-setlocal expandtab shiftwidth=2 tabstop=2
+setlocal expandtab shiftwidth=2 softtabstop=2
 setlocal foldmethod=syntax
 " Treat asterisks as regular list bullets, not multi-line comment prefixes
 setlocal comments-=mb:*
