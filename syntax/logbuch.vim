@@ -16,6 +16,7 @@ setlocal comments+=fb:*
 if v:version > 703
     setlocal conceallevel=2
 endif
+setlocal foldcolumn=1
 
 " Styling {{{
 hi def link   logbuchDate              Title
@@ -77,10 +78,6 @@ syntax match logbuchAuthor /[^<]\+/ contained nextgroup=logbuchEmail
 syntax match logbuchEmail /<.\+>/ conceal transparent cchar=@
             \ contained
 " }}}
-
-" Default fold level: collapse inidiviual bullet points
-setlocal foldlevel=0
-setlocal foldcolumn=1
 
 let b:current_syntax = 'logbuch'
 " vim: set fdm=marker foldlevel=0 et sw=4 ts=4
