@@ -2,10 +2,6 @@ scriptencoding utf-8
 
 setlocal foldmethod=expr
 setlocal foldtext=LogbuchFold(v:lnum) " in ftplugin
-if exists('+breakindent')
-    setlocal breakindent
-    setlocal breakindentopt=shift:4
-endif
 
 " {{{ Functions
 
