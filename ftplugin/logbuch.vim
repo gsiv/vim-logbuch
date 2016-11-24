@@ -215,6 +215,17 @@ function! s:ModifyVisualSelection()
     execute "normal! $h"
 endfunction
 
+function! s:WriteToScreenExchangeFile()
+    " Write contents of register "l" to default screen exchange file.  This
+    " file can be read into screen's paste buffer (readbuf, C-a<).
+    "
+    " TODO: Known issues:
+    " - overrides users' "l" register, potentially leading to data loss
+    " - overrides /tmp/screen-exchange, potentially leading to data loss
+    let screen_exchange = "/tmp/screen-exchange"
+    execute "edit" . screen_exchange . "| %d | 0put l | $d | w | bd" . screen_exchange
+endfunction
+
 " }}}
 
 " {{{ <Plug> Mappings
@@ -281,6 +292,11 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-below)
 noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
         \ :<C-u>call <SID>ModifyVisualSelection()<CR>
 
+" No-X Editing:
+" Mapping for interaction with screen's copy/paste buffer:
+noremap <script> <buffer> <silent> <Plug>(logbuch-write-screenexchange)
+        \ :<C-u>call <SID>WriteToScreenExchangeFile()<CR>
+
 " }}}
 
 " {{{ Default mappings
@@ -308,6 +324,20 @@ if exists("g:logbuch_cfg_no_mapping")
     endif
 else
     call s:set_default_key_maps()
+endif
+
+" XXX: tmp
+let g:logbuch_screenexchange_mapping = 1
+
+if exists("g:logbuch_screenexchange_mapping")
+    " if not disabled by user
+    if g:logbuch_screenexchange_mapping != 0
+        " - modify selection
+        " - yank into register "l"
+        " - write /tmp/screen-exchange
+        silent execute 'map <leader>lx <Plug>(logbuch-modify-selection)"ly<Esc>
+                    \<Plug>(logbuch-write-screenexchange)'
+    endif
 endif
 " }}}
 
