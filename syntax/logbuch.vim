@@ -15,7 +15,6 @@ setlocal comments+=fb:*
 if v:version > 703
     setlocal conceallevel=2
 endif
-setlocal foldcolumn=1
 
 " Styling {{{
 hi def link   logbuchDate              Title
