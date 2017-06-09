@@ -85,6 +85,9 @@ This plugin extends netrw's functionality.
         Like *gf* but open the file path under the cursor on the remote
         machine.
 
+*<leader>ln*                                     <Plug>(logbuch-remote-new-host)
+        Open an :edit prompt for a logbuch.txt on a new remote host.
+
 ==============================================================================
 OPTIONS                                                        *logbuch-options*
 
