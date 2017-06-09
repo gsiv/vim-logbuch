@@ -125,7 +125,9 @@ endfunction
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
 function! s:NetrwPrompt()
     let l:netrw_host = s:NetrwHost()
-    execute input("", "edit " . l:netrw_host)
+    let l:path = input("Edit file on " . l:netrw_host . " : ", "")
+    execute "edit " . l:netrw_host . "/" . l:path
+endfunction
 endfunction
 
 function! s:SetMarker(pos)
