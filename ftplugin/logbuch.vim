@@ -123,14 +123,14 @@ function! s:RemoteGF()
 endfunction
 
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
-function! s:NetrwPrompt()
+function! s:NetrwEditFilePrompt()
     let l:netrw_host = s:NetrwHost()
     let l:path = input("Edit file on " . l:netrw_host . " : ", "")
     execute "edit " . l:netrw_host . "/" . l:path
 endfunction
 
 " Open an :edit prompt for a new host
-function! s:NetrwNewHost()
+function! s:NetrwNewHostPrompt()
     let l:new_host = input("Edit logbuch on host: ", "scp://root@")
     execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
@@ -276,10 +276,10 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-remote-gf)
         \ :<C-u>call <SID>RemoteGF()<CR>
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
 noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
-        \ :<C-u>call <SID>NetrwPrompt()<CR>
+        \ :<C-u>call <SID>NetrwEditFilePrompt()<CR>
 " Open an :edit prompt for a new host
 noremap <script> <buffer> <silent> <Plug>(logbuch-remote-new-host)
-        \ :<C-u>call <SID>NetrwNewHost()<CR>
+        \ :<C-u>call <SID>NetrwNewHostPrompt()<CR>
 
 " Set marker line
 noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
