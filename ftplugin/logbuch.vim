@@ -125,8 +125,20 @@ endfunction
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
 function! s:NetrwEditFilePrompt()
     let l:netrw_host = s:NetrwHost()
-    let l:path = input("Edit file on " . l:netrw_host . " : ", "")
-    execute "edit " . l:netrw_host . "/" . l:path
+    if l:netrw_host != ""
+        let l:path = input("Edit file on " . l:netrw_host . " : ", "")
+        if l:path != ""
+            execute "edit " . l:netrw_host . "/" . l:path
+        endif
+    else
+        " If no netrw host was found, offer a normal :edit prompt.  Actually,
+        " this kind of recreates an :edit prompt; there is probably a better
+        " way to enter the actual command line.
+        let l:path = input(":edit ", "", "file")
+        if l:path != ""
+            execute "edit " . l:path
+        endif
+    endif
 endfunction
 
 " Open an :edit prompt for a new host
