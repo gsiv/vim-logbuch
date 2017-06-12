@@ -308,20 +308,20 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
 " {{{ Default mappings
 "
 function! s:set_default_key_maps()
-    silent execute 'map ]]          <Plug>(logbuch-next-section)'
-    silent execute 'map [[          <Plug>(logbuch-prev-section)'
-    silent execute 'map ][          <Plug>(logbuch-next-subsection)'
-    silent execute 'map []          <Plug>(logbuch-prev-subsection)'
+    silent execute 'map <buffer> ]]          <Plug>(logbuch-next-section)'
+    silent execute 'map <buffer> [[          <Plug>(logbuch-prev-section)'
+    silent execute 'map <buffer> ][          <Plug>(logbuch-next-subsection)'
+    silent execute 'map <buffer> []          <Plug>(logbuch-prev-subsection)'
 
-    silent execute 'map <leader>o   <Plug>(logbuch-new)'
-    silent execute 'map <leader>O   <Plug>(logbuch-new-from-template)'
+    silent execute 'map <buffer> <leader>o   <Plug>(logbuch-new)'
+    silent execute 'map <buffer> <leader>O   <Plug>(logbuch-new-from-template)'
 
-    silent execute 'map <leader>gf  <Plug>(logbuch-remote-gf)'
-    silent execute 'map <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
+    silent execute 'map <buffer> <leader>gf  <Plug>(logbuch-remote-gf)'
+    silent execute 'map <buffer> <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
-    silent execute 'map <leader>lv  <Plug>(logbuch-modify-selection)'
-    silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-above)'
-    silent execute 'map <leader>ln  <Plug>(logbuch-remote-new-host)'
+    silent execute 'map <buffer> <leader>lv  <Plug>(logbuch-modify-selection)'
+    silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
+    silent execute 'map <buffer> <leader>ln  <Plug>(logbuch-remote-new-host)'
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")
