@@ -144,6 +144,12 @@ endfunction
 " Open an :edit prompt for a new host
 function! s:NetrwNewHostPrompt()
     let l:new_host = input("Edit logbuch on host: ", "scp://root@")
+    " return of aborted
+    if len(l:new_host) == 0
+        " clear prompt
+        normal :<ESC>
+        return 0
+    endif
     execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
 
@@ -160,6 +166,12 @@ function! s:NetrwNewHostSubstitutePrompt()
     " prompt.
     let l:hostname_subst = split(l:hostname_subst, '/')
     " Check for correct number of arguments
+    if len(l:hostname_subst) == 0
+        " clear prompt
+        " redraw!
+        normal :<ESC>
+        return 0
+    endif
     if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
         echohl LogbuchError
         echo "\nERROR: Invalid regular expression.\n"
