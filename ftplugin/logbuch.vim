@@ -158,13 +158,13 @@ endfunction
 " current hostname.
 function! s:NetrwNewHostSubstitutePrompt()
     let l:netrw_host = s:NetrwHost()
-    let l:hostname_subst = input("Substitute in hostname: s/", "")
+    let l:regex_input = input("Substitute in hostname: s/", "")
     " This is a dumb regex parser.  It won't recognize escaped slashes or
     " allow alternative separators like Vim would.  Considering that it will
     " only ever be used for hostnames this should be okay.  There should also
     " be no confusion regarding the separators because we dictate '/' in the
     " prompt.
-    let l:hostname_subst = split(l:hostname_subst, '/')
+    let l:hostname_subst = split(l:regex_input, '/')
     " Check for correct number of arguments
     if len(l:hostname_subst) == 0
         " clear prompt
