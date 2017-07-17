@@ -1,20 +1,19 @@
 *logbuch.txt*  Syntax highlighting and handy mappings for logbuch.txt files
 
-
-Author:  Gernot Schulz <gernot@intevation.de>
-License: TBD
-
 ==============================================================================
 INTRODUCTION                                                     *logbuch-intro*
 
 This plugin provides syntax highlighting and mappings for working with
 logbuch.txt files.
 
-For automatic file type detection, add something like the following
-autocommand to your vimrc: >
+==============================================================================
+LICENSE                                                        *logbuch-license*
 
-    autocmd BufNewFile,BufRead */logbuch.txt set filetype=logbuch
-<
+logbuch.vim Copyright © 2016, 2017 Gernot Schulz <gernot@intevation.de>
+Licensed under the GNU General Public License (GPL), version 2 or later.
+Absolutely no warranty, see COPYING file for details.
+
+    https://www.gnu.org/licenses/gpl-2.0.txt
 
 ==============================================================================
 WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
