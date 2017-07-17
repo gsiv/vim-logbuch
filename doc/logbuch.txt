@@ -88,6 +88,19 @@ This plugin extends netrw's functionality.
 *<leader>ln*                                     <Plug>(logbuch-remote-new-host)
         Open an :edit prompt for a logbuch.txt on a new remote host.
 
+*<leader>lN*                              <Plug>(logbuch-remote-substitute-host)
+        Like logbuch-remote-new-host but before opening the :edit prompt apply
+        the given substitution regex on the current hostname.
+
+        For example, assuming the current buffer is: >
+
+          scp://root@web1.example.com//etc/logbuch.txt
+<
+        The pattern s/web/db/ given to this function would open the following
+        prompt: >
+
+          :edit scp://root@db1.example.com//etc/logbuch.txt
+<
 ==============================================================================
 OPTIONS                                                        *logbuch-options*
 

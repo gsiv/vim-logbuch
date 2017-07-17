@@ -126,7 +126,7 @@ endfunction
 function! s:NetrwEditFilePrompt()
     let l:netrw_host = s:NetrwHost()
     if l:netrw_host != ""
-        let l:path = input("Edit file on " . l:netrw_host . " : ", "")
+        let l:path = input("Edit file on " . l:netrw_host . ": ", "")
         if l:path != ""
             execute "edit " . l:netrw_host . "/" . l:path
         endif
@@ -144,6 +144,35 @@ endfunction
 " Open an :edit prompt for a new host
 function! s:NetrwNewHostPrompt()
     let l:new_host = input("Edit logbuch on host: ", "scp://root@")
+    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
+endfunction
+
+" Open an :edit prompt for a new host.  Unlike NetrwNewHostPrompt the new
+" hostname is not given directly but determined by a regex that modifies the
+" current hostname.
+function! s:NetrwNewHostSubstitutePrompt()
+    let l:netrw_host = s:NetrwHost()
+    let l:hostname_subst = input("Substitute in hostname: s/", "")
+    " This is a dumb regex parser.  It won't recognize escaped slashes or
+    " allow alternative separators like Vim would.  Considering that it will
+    " only ever be used for hostnames this should be okay.  There should also
+    " be no confusion regarding the separators because we dictate '/' in the
+    " prompt.
+    let l:hostname_subst = split(l:hostname_subst, '/')
+    " Check for correct number of arguments
+    if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
+        echohl LogbuchError
+        echo "\nERROR: Invalid regular expression.\n"
+        echohl None
+        return 1
+    endif
+    " substitute() flag in case it was given
+    let l:subst_flag = ''
+    if len(l:hostname_subst) == 3
+        let l:subst_flag = l:hostname_subst[2]
+    endif
+    let l:new_host = substitute(l:netrw_host, l:hostname_subst[0],
+                \ l:hostname_subst[1], subst_flag)
     execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
 
@@ -292,6 +321,9 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
 " Open an :edit prompt for a new host
 noremap <script> <buffer> <silent> <Plug>(logbuch-remote-new-host)
         \ :<C-u>call <SID>NetrwNewHostPrompt()<CR>
+" Open an :edit prompt for a new host after applying regex substitution
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-substitute-host)
+        \ :<C-u>call <SID>NetrwNewHostSubstitutePrompt()<CR>
 
 " Set marker line
 noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
@@ -322,6 +354,7 @@ function! s:set_default_key_maps()
     silent execute 'map <buffer> <leader>lv  <Plug>(logbuch-modify-selection)'
     silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
     silent execute 'map <buffer> <leader>ln  <Plug>(logbuch-remote-new-host)'
+    silent execute 'map <buffer> <leader>lN  <Plug>(logbuch-remote-substitute-host)'
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")

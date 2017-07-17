@@ -28,6 +28,10 @@ hi def link   logbuchItemComment       Function
 hi def link   logbuchItemBody          Comment
 hi def link   logbuchItemFile          Underlined
 hi def link   logbuchItemMarker        CursorLineNr
+
+" Formatting for script messages
+highlight default link LogbuchWarning WarningMsg
+highlight default link LogbuchError ErrorMsg
 " }}}
 
 " Preamble {{{
