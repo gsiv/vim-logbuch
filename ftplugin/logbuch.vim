@@ -422,8 +422,9 @@ function! s:WriteToScreenExchangeFile()
     "
     " TODO: Known issues:
     " - overrides users' "l" register, potentially leading to data loss
-    " - overrides /tmp/screen-exchange, potentially leading to data loss
-    let screen_exchange = "/tmp/screen-exchange"
+    let user = "unknown"
+    let user = $LOGNAME
+    let screen_exchange = "/tmp/logbuch-screen-exchange-" . user
     execute "edit" . screen_exchange . "| %d | 0put l | $d | w | bd" . screen_exchange
 endfunction
 
