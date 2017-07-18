@@ -136,8 +136,7 @@ if exists("g:logbuch_screenexchange_mapping")
         " - modify selection
         " - yank into register "l"
         " - write /tmp/screen-exchange
-        silent execute 'map <leader>lx <Plug>(logbuch-modify-selection)"ly<Esc>
-                    \<Plug>(logbuch-write-screenexchange)'
+        silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
     endif
 endif
 
@@ -417,15 +416,18 @@ function! s:ModifyVisualSelection()
 endfunction
 
 function! s:WriteToScreenExchangeFile()
-    " Write contents of register "l" to default screen exchange file.  This
-    " file can be read into screen's paste buffer (readbuf, C-a<).
-    "
-    " TODO: Known issues:
-    " - overrides users' "l" register, potentially leading to data loss
-    let user = "unknown"
+    " Write selected logbuch text to screen exchange file.  This file can be
+    " read into screen's paste buffer (readbuf, C-a<).
     let user = $LOGNAME
     let screen_exchange = "/tmp/logbuch-screen-exchange-" . user
+
+    call <SID>ModifyVisualSelection()
+    let l:old_register = @l
+    " yank selection to register l
+    execute 'normal! "ly'
     execute "edit" . screen_exchange . "| %d | 0put l | $d | w | bd" . screen_exchange
+    " restore register l
+    let @l = l:old_register
 endfunction
 
 " }}}
