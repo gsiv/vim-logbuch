@@ -22,6 +22,9 @@ setlocal foldtext=LogbuchFold(v:lnum) " in ftplugin
 " Pattern that matches beginnings of new logbuch entries
 let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
 
+let s:user = $LOGNAME
+let s:screen_exchange = "/tmp/logbuch-screen-exchange-" . s:user
+
 " {{{ <Plug> Mappings
 " Navigation: Normal mode
 "  logbuch entry date lines
@@ -119,6 +122,11 @@ function! s:set_default_key_maps()
     silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
 endfunction
 
+" {{{ Command definitions
+command LogbuchExchange call <SID>SetUpScreenExchange()
+" }}}
+
+
 if exists("g:logbuch_cfg_no_mapping")
     " if not disabled by user
     if g:logbuch_cfg_no_mapping != 1
@@ -133,7 +141,6 @@ if exists("g:loaded_logbuch_plugin")
   finish
 endif
 let g:loaded_logbuch_plugin = 1
-
 
 " {{{ Functions
 
@@ -404,19 +411,57 @@ function! s:ModifyVisualSelection()
     execute "normal! $h"
 endfunction
 
+function! s:SetUpScreenExchange()
+    " Prepare the screen-exchange file and define screen bindings
+    let l:termcap=system('env | grep TERMCAP')
+    " Check if running in known shell
+    " XXX: There must be a more robust check
+    if &shell != "/bin/bash" && &shell != "/bin/zsh"
+        echohl LogbuchError
+        echo "ERROR: Unknown shell."
+        echohl None
+        return 1
+    endif
+    " Check if running in Screen session
+    if l:termcap !~? "screen"
+        echohl LogbuchError
+        echo "ERROR: No Screen session detected."
+        echohl None
+        return 1
+    endif
+    call system('touch ' . shellescape(s:screen_exchange))
+    call system('chmod 660 ' . shellescape(s:screen_exchange))
+    call system('screen -X bind ^e eval "readbuf '
+                \ . s:screen_exchange . '" "paste ."')
+    " XXX: use shellescape
+    call system('screen -X bind e eval "screen -t LogbuchExchange-preview" '
+                \ . '"stuff ''more '
+                \ . s:screen_exchange
+                \ . ' # Contents of ' .  s:screen_exchange
+                \ . '\n''"')
+    let g:logbuch_exchange_setup = 1
+endfunction
+
 function! s:WriteToScreenExchangeFile()
     " Write selected logbuch text to screen exchange file.  This file can be
     " read into screen's paste buffer (readbuf, C-a<).
-    let user = $LOGNAME
-    let screen_exchange = "/tmp/logbuch-screen-exchange-" . user
 
     call <SID>ModifyVisualSelection()
     let l:old_register = @l
     " yank selection to register l
     execute 'normal! "ly'
-    execute "edit" . screen_exchange . "| %d | 0put l | $d | w | bd" . screen_exchange
+    execute "edit" . s:screen_exchange . "| %d | 0put l | $d | w | bd" . s:screen_exchange
     " restore register l
     let @l = l:old_register
+
+    " Check if SetUpScreenExchange() has run before
+    " XXX: The Screen settings added by SetUpScreenExchange could already be
+    "      set in .screenrc, so this warning could get annoying.
+    if !exists("g:logbuch_exchange_setup")
+        echohl LogbuchWarning
+        echo "WARN: Screen may not be set up for pasting; run :LogbuchExchange?"
+        echohl None
+    endif
 endfunction
 
 " }}}
