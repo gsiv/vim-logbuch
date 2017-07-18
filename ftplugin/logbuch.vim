@@ -114,7 +114,7 @@ function! s:set_default_key_maps()
     silent execute 'map <buffer> <leader>gf  <Plug>(logbuch-remote-gf)'
     silent execute 'map <buffer> <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
-    silent execute 'map <buffer> <leader>lv  <Plug>(logbuch-modify-selection)'
+    silent execute 'vmap <buffer> <leader>lv <Plug>(logbuch-modify-selection)'
     silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
     silent execute 'map <buffer> <leader>ln  <Plug>(logbuch-remote-new-host)'
     silent execute 'map <buffer> <leader>lN  <Plug>(logbuch-remote-substitute-host)'
