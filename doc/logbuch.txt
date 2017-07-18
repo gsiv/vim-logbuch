@@ -1,20 +1,19 @@
 *logbuch.txt*  Syntax highlighting and handy mappings for logbuch.txt files
 
-
-Author:  Gernot Schulz <gernot@intevation.de>
-License: TBD
-
 ==============================================================================
 INTRODUCTION                                                     *logbuch-intro*
 
 This plugin provides syntax highlighting and mappings for working with
 logbuch.txt files.
 
-For automatic file type detection, add something like the following
-autocommand to your vimrc: >
+==============================================================================
+LICENSE                                                        *logbuch-license*
 
-    autocmd BufNewFile,BufRead */logbuch.txt set filetype=logbuch
-<
+logbuch.vim Copyright © 2016, 2017 Gernot Schulz <gernot@intevation.de>
+Licensed under the GNU General Public License (GPL), version 2 or later.
+Absolutely no warranty, see COPYING file for details.
+
+    https://www.gnu.org/licenses/gpl-2.0.txt
 
 ==============================================================================
 WORKING WITH LOGBUCH FILES                                *logbuch-create-entry*
@@ -85,6 +84,22 @@ This plugin extends netrw's functionality.
         Like *gf* but open the file path under the cursor on the remote
         machine.
 
+*<leader>ln*                                     <Plug>(logbuch-remote-new-host)
+        Open an :edit prompt for a logbuch.txt on a new remote host.
+
+*<leader>lN*                              <Plug>(logbuch-remote-substitute-host)
+        Like logbuch-remote-new-host but before opening the :edit prompt apply
+        the given substitution regex on the current hostname.
+
+        For example, assuming the current buffer is: >
+
+          scp://root@web1.example.com//etc/logbuch.txt
+<
+        The pattern s/web/db/ given to this function would open the following
+        prompt: >
+
+          :edit scp://root@db1.example.com//etc/logbuch.txt
+<
 ==============================================================================
 OPTIONS                                                        *logbuch-options*
 

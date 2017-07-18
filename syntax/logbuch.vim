@@ -1,3 +1,19 @@
+" syntax/logbuch.vim: logbuch.vim syntax highlighting
+" Copyright (C) 2016, 2017 Gernot Schulz <gernot@intevation.de>
+"
+" This program is free software; you can redistribute it and/or modify
+" it under the terms of the GNU General Public License as published by
+" the Free Software Foundation; either version 2 of the License, or
+" (at your option) any later version.
+"
+" This program is distributed in the hope that it will be useful,
+" but WITHOUT ANY WARRANTY; without even the implied warranty of
+" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+" GNU General Public License for more details.
+"
+" You should have received a copy of the GNU General Public License
+" along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 scriptencoding utf-8
 
 " TODO:
@@ -8,8 +24,10 @@ if exists('b:current_syntax') | finish |  endif
 syntax clear
 syntax sync fromstart
 
-setlocal expandtab shiftwidth=2 tabstop=2
 setlocal foldmethod=syntax
+" Treat asterisks as regular list bullets, not multi-line comment prefixes
+setlocal comments-=mb:*
+setlocal comments+=fb:*
 if v:version > 703
     setlocal conceallevel=2
 endif
@@ -26,6 +44,10 @@ hi def link   logbuchItemComment       Function
 hi def link   logbuchItemBody          Comment
 hi def link   logbuchItemFile          Underlined
 hi def link   logbuchItemMarker        CursorLineNr
+
+" Formatting for script messages
+highlight default link LogbuchWarning WarningMsg
+highlight default link LogbuchError ErrorMsg
 " }}}
 
 " Preamble {{{
@@ -74,10 +96,6 @@ syntax match logbuchAuthor /[^<]\+/ contained nextgroup=logbuchEmail
 syntax match logbuchEmail /<.\+>/ conceal transparent cchar=@
             \ contained
 " }}}
-
-" Default fold level: collapse inidiviual bullet points
-setlocal foldlevel=0
-setlocal foldcolumn=1
 
 let b:current_syntax = 'logbuch'
 " vim: set fdm=marker foldlevel=0 et sw=4 ts=4

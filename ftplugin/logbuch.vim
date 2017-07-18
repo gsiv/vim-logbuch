@@ -1,12 +1,153 @@
+" ftplugin/logbuch.vim: logbuch.vim functions, commands, and settings
+" Copyright (C) 2016, 2017 Gernot Schulz <gernot@intevation.de>
+"
+" This program is free software; you can redistribute it and/or modify
+" it under the terms of the GNU General Public License as published by
+" the Free Software Foundation; either version 2 of the License, or
+" (at your option) any later version.
+"
+" This program is distributed in the hope that it will be useful,
+" but WITHOUT ANY WARRANTY; without even the implied warranty of
+" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+" GNU General Public License for more details.
+"
+" You should have received a copy of the GNU General Public License
+" along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 scriptencoding utf-8
 
 setlocal foldmethod=expr
 setlocal foldtext=LogbuchFold(v:lnum) " in ftplugin
 
-" {{{ Functions
-
 " Pattern that matches beginnings of new logbuch entries
 let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
+
+" {{{ <Plug> Mappings
+" Navigation: Normal mode
+"  logbuch entry date lines
+" ]]
+noremap <script> <buffer> <silent> <Plug>(logbuch-next-section)
+        \ :<C-u>call <SID>NextLog(1, 0, 0)<CR>
+
+" [[
+noremap <script> <buffer> <silent> <Plug>(logbuch-prev-section)
+        \ :<C-u>call <SID>NextLog(1, 1, 0)<CR>
+
+"  logbuch bullet point lines
+" ][
+noremap <script> <buffer> <silent> <Plug>(logbuch-next-subsection)
+        \ :<C-u>call <SID>NextLog(2, 0, 0)<CR>
+
+" []
+noremap <script> <buffer> <silent> <Plug>(logbuch-prev-subsection)
+        \ :<C-u>call <SID>NextLog(2, 1, 0)<CR>
+
+" Navigation: Visual mode
+" ]]
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-next-section)
+        \ :<C-u>call <SID>NextLog(1, 0, 1)<CR>
+
+" [[
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-prev-section)
+        \ :<C-u>call <SID>NextLog(1, 1, 1)<CR>
+
+" ][
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-next-subsection)
+        \ :<C-u>call <SID>NextLog(2, 0, 1)<CR>
+
+" []
+vnoremap <script> <buffer> <silent> <Plug>(logbuch-prev-subsection)
+        \ :<C-u>call <SID>NextLog(2, 1, 1)<CR>
+
+" New log
+noremap <script> <buffer> <silent> <Plug>(logbuch-new)
+        \ :<C-u>call <SID>NewLog()<CR>
+" New log from template
+noremap <script> <buffer> <silent> <Plug>(logbuch-new-from-template)
+        \ :<C-u>call <SID>NewLogFromTemplate()<CR>
+
+" Remote Editing:
+" Open file under cursor; like `:e <cfile>` but open on same host as current
+" file if using netrw
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-gf)
+        \ :<C-u>call <SID>RemoteGF()<CR>
+" Open an :edit prompt with the remote (<protocol>://<host>) filled in
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
+        \ :<C-u>call <SID>NetrwEditFilePrompt()<CR>
+" Open an :edit prompt for a new host
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-new-host)
+        \ :<C-u>call <SID>NetrwNewHostPrompt()<CR>
+" Open an :edit prompt for a new host after applying regex substitution
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-substitute-host)
+        \ :<C-u>call <SID>NetrwNewHostSubstitutePrompt()<CR>
+
+" Set marker line
+noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
+        \ :<C-u>call <SID>SetMarker(0)<CR>
+noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-below)
+        \ :<C-u>call <SID>SetMarker(1)<CR>
+
+" Modify visual selection
+noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
+        \ :<C-u>call <SID>ModifyVisualSelection()<CR>
+
+" No-X Editing:
+" Mapping for interaction with screen's copy/paste buffer:
+noremap <script> <buffer> <silent> <Plug>(logbuch-write-screenexchange)
+        \ :<C-u>call <SID>WriteToScreenExchangeFile()<CR>
+
+" }}}
+" {{{ Default mappings
+"
+function! s:set_default_key_maps()
+    silent execute 'map <buffer> ]]          <Plug>(logbuch-next-section)'
+    silent execute 'map <buffer> [[          <Plug>(logbuch-prev-section)'
+    silent execute 'map <buffer> ][          <Plug>(logbuch-next-subsection)'
+    silent execute 'map <buffer> []          <Plug>(logbuch-prev-subsection)'
+
+    silent execute 'map <buffer> <leader>o   <Plug>(logbuch-new)'
+    silent execute 'map <buffer> <leader>O   <Plug>(logbuch-new-from-template)'
+
+    silent execute 'map <buffer> <leader>gf  <Plug>(logbuch-remote-gf)'
+    silent execute 'map <buffer> <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
+
+    silent execute 'map <buffer> <leader>lv  <Plug>(logbuch-modify-selection)'
+    silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
+    silent execute 'map <buffer> <leader>ln  <Plug>(logbuch-remote-new-host)'
+    silent execute 'map <buffer> <leader>lN  <Plug>(logbuch-remote-substitute-host)'
+endfunction
+
+if exists("g:logbuch_cfg_no_mapping")
+    " if not disabled by user
+    if g:logbuch_cfg_no_mapping != 1
+        call s:set_default_key_maps()
+    endif
+else
+    call s:set_default_key_maps()
+endif
+" }}}
+
+" XXX: tmp
+let g:logbuch_screenexchange_mapping = 1
+
+if exists("g:logbuch_screenexchange_mapping")
+    " if not disabled by user
+    if g:logbuch_screenexchange_mapping != 0
+        " - modify selection
+        " - yank into register "l"
+        " - write /tmp/screen-exchange
+        silent execute 'map <leader>lx <Plug>(logbuch-modify-selection)"ly<Esc>
+                    \<Plug>(logbuch-write-screenexchange)'
+    endif
+endif
+
+if exists("g:loaded_logbuch_plugin")
+  finish
+endif
+let g:loaded_logbuch_plugin = 1
+
+
+" {{{ Functions
 
 function! s:NextLog(type, backwards, visual)
     let l:vcount = v:count1
@@ -123,9 +264,69 @@ function! s:RemoteGF()
 endfunction
 
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
-function! s:NetrwPrompt()
+function! s:NetrwEditFilePrompt()
     let l:netrw_host = s:NetrwHost()
-    execute input("", "edit " . l:netrw_host)
+    if l:netrw_host != ""
+        let l:path = input("Edit file on " . l:netrw_host . ": ", "")
+        if l:path != ""
+            execute "edit " . l:netrw_host . "/" . l:path
+        endif
+    else
+        " If no netrw host was found, offer a normal :edit prompt.  Actually,
+        " this kind of recreates an :edit prompt; there is probably a better
+        " way to enter the actual command line.
+        let l:path = input(":edit ", "", "file")
+        if l:path != ""
+            execute "edit " . l:path
+        endif
+    endif
+endfunction
+
+" Open an :edit prompt for a new host
+function! s:NetrwNewHostPrompt()
+    let l:new_host = input("Edit logbuch on host: ", "scp://root@")
+    " return of aborted
+    if len(l:new_host) == 0
+        " clear prompt
+        normal :<ESC>
+        return 0
+    endif
+    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
+endfunction
+
+" Open an :edit prompt for a new host.  Unlike NetrwNewHostPrompt the new
+" hostname is not given directly but determined by a regex that modifies the
+" current hostname.
+function! s:NetrwNewHostSubstitutePrompt()
+    let l:netrw_host = s:NetrwHost()
+    let l:regex_input = input("Substitute in hostname: s/", "")
+    " This is a dumb regex parser.  It won't recognize escaped slashes or
+    " allow alternative separators like Vim would.  Considering that it will
+    " only ever be used for hostnames this should be okay.  There should also
+    " be no confusion regarding the separators because we dictate '/' in the
+    " prompt.
+    let l:hostname_subst = split(l:regex_input, '/')
+    " Check for correct number of arguments
+    if len(l:hostname_subst) == 0
+        " clear prompt
+        " redraw!
+        normal :<ESC>
+        return 0
+    endif
+    if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
+        echohl LogbuchError
+        echo "\nERROR: Invalid regular expression.\n"
+        echohl None
+        return 1
+    endif
+    " substitute() flag in case it was given
+    let l:subst_flag = ''
+    if len(l:hostname_subst) == 3
+        let l:subst_flag = l:hostname_subst[2]
+    endif
+    let l:new_host = substitute(l:netrw_host, l:hostname_subst[0],
+                \ l:hostname_subst[1], subst_flag)
+    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
 
 function! s:SetMarker(pos)
@@ -226,119 +427,6 @@ function! s:WriteToScreenExchangeFile()
     execute "edit" . screen_exchange . "| %d | 0put l | $d | w | bd" . screen_exchange
 endfunction
 
-" }}}
-
-" {{{ <Plug> Mappings
-" Navigation: Normal mode
-"  logbuch entry date lines
-" ]]
-noremap <script> <buffer> <silent> <Plug>(logbuch-next-section)
-        \ :<C-u>call <SID>NextLog(1, 0, 0)<CR>
-
-" [[
-noremap <script> <buffer> <silent> <Plug>(logbuch-prev-section)
-        \ :<C-u>call <SID>NextLog(1, 1, 0)<CR>
-
-"  logbuch bullet point lines
-" ][
-noremap <script> <buffer> <silent> <Plug>(logbuch-next-subsection)
-        \ :<C-u>call <SID>NextLog(2, 0, 0)<CR>
-
-" []
-noremap <script> <buffer> <silent> <Plug>(logbuch-prev-subsection)
-        \ :<C-u>call <SID>NextLog(2, 1, 0)<CR>
-
-" Navigation: Visual mode
-" ]]
-vnoremap <script> <buffer> <silent> <Plug>(logbuch-next-section)
-        \ :<C-u>call <SID>NextLog(1, 0, 1)<CR>
-
-" [[
-vnoremap <script> <buffer> <silent> <Plug>(logbuch-prev-section)
-        \ :<C-u>call <SID>NextLog(1, 1, 1)<CR>
-
-" ][
-vnoremap <script> <buffer> <silent> <Plug>(logbuch-next-subsection)
-        \ :<C-u>call <SID>NextLog(2, 0, 1)<CR>
-
-" []
-vnoremap <script> <buffer> <silent> <Plug>(logbuch-prev-subsection)
-        \ :<C-u>call <SID>NextLog(2, 1, 1)<CR>
-
-" New log
-noremap <script> <buffer> <silent> <Plug>(logbuch-new)
-        \ :<C-u>call <SID>NewLog()<CR>
-" New log from template
-noremap <script> <buffer> <silent> <Plug>(logbuch-new-from-template)
-        \ :<C-u>call <SID>NewLogFromTemplate()<CR>
-
-
-" Remote Editing:
-" Open file under cursor; like `:e <cfile>` but open on same host as current
-" file if using netrw
-noremap <script> <buffer> <silent> <Plug>(logbuch-remote-gf)
-        \ :<C-u>call <SID>RemoteGF()<CR>
-" Open an :edit prompt with the remote (<protocol>://<host>) filled in
-noremap <script> <buffer> <silent> <Plug>(logbuch-remote-edit-prompt)
-        \ :<C-u>call <SID>NetrwPrompt()<CR>
-
-" Set marker line
-noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
-        \ :<C-u>call <SID>SetMarker(0)<CR>
-noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-below)
-        \ :<C-u>call <SID>SetMarker(1)<CR>
-
-" Modify visual selection
-noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
-        \ :<C-u>call <SID>ModifyVisualSelection()<CR>
-
-" No-X Editing:
-" Mapping for interaction with screen's copy/paste buffer:
-noremap <script> <buffer> <silent> <Plug>(logbuch-write-screenexchange)
-        \ :<C-u>call <SID>WriteToScreenExchangeFile()<CR>
-
-" }}}
-
-" {{{ Default mappings
-"
-function! s:set_default_key_maps()
-    silent execute 'map ]]          <Plug>(logbuch-next-section)'
-    silent execute 'map [[          <Plug>(logbuch-prev-section)'
-    silent execute 'map ][          <Plug>(logbuch-next-subsection)'
-    silent execute 'map []          <Plug>(logbuch-prev-subsection)'
-
-    silent execute 'map <leader>o   <Plug>(logbuch-new)'
-    silent execute 'map <leader>O   <Plug>(logbuch-new-from-template)'
-
-    silent execute 'map <leader>gf  <Plug>(logbuch-remote-gf)'
-    silent execute 'map <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
-
-    silent execute 'map <leader>lv  <Plug>(logbuch-modify-selection)'
-    silent execute 'map <leader>ll  <Plug>(logbuch-todo-marker-above)'
-endfunction
-
-if exists("g:logbuch_cfg_no_mapping")
-    " if not disabled by user
-    if g:logbuch_cfg_no_mapping != 1
-        call s:set_default_key_maps()
-    endif
-else
-    call s:set_default_key_maps()
-endif
-
-" XXX: tmp
-let g:logbuch_screenexchange_mapping = 1
-
-if exists("g:logbuch_screenexchange_mapping")
-    " if not disabled by user
-    if g:logbuch_screenexchange_mapping != 0
-        " - modify selection
-        " - yank into register "l"
-        " - write /tmp/screen-exchange
-        silent execute 'map <leader>lx <Plug>(logbuch-modify-selection)"ly<Esc>
-                    \<Plug>(logbuch-write-screenexchange)'
-    endif
-endif
 " }}}
 
 " vim: fdm=marker et sw=4 ts=4
