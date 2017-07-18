@@ -115,6 +115,8 @@ function! s:set_default_key_maps()
     silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
     silent execute 'map <buffer> <leader>ln  <Plug>(logbuch-remote-new-host)'
     silent execute 'map <buffer> <leader>lN  <Plug>(logbuch-remote-substitute-host)'
+
+    silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")
@@ -126,19 +128,6 @@ else
     call s:set_default_key_maps()
 endif
 " }}}
-
-" XXX: tmp
-let g:logbuch_screenexchange_mapping = 1
-
-if exists("g:logbuch_screenexchange_mapping")
-    " if not disabled by user
-    if g:logbuch_screenexchange_mapping != 0
-        " - modify selection
-        " - yank into register "l"
-        " - write /tmp/screen-exchange
-        silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
-    endif
-endif
 
 if exists("g:loaded_logbuch_plugin")
   finish
