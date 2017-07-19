@@ -100,6 +100,36 @@ This plugin extends netrw's functionality.
 
           :edit scp://root@db1.example.com//etc/logbuch.txt
 <
+
+------------------------------------------------------------------------------
+WORKING IN SCREEN SESSIONS                                      *logbuch-screen*
+
+logbuch.vim can interact with a GNU screen session for easier copy & pasting
+from Vim to the shell.
+
+The central feature is simply copying visual selections to a temporary file
+(bufferfile).  From there, screen can “slurp up” and paste the text into
+a buffer.
+
+*<leader>lx*                                       *<Plug>(logbuch-screen-copy)*
+
+        Write the visual selection to the screen exchange file.
+
+*:LogbuchExchange*                                            *:LogbuchExchange*
+
+        Prepare the current screen session for pasting from logbuch.vim by
+        setting up a temporary screen exchange file in /tmp and configuring
+        new screen key bindings.
+
+        The screen bindings added by this command are:
+
+          1) e   Preview the contents of the screen exchange file
+          2) ^e  Paste the contents of the exchange file into the buffer
+
+        :LogbuchExchange usually only has to be run once per screen session.
+        Alternatively, the bufferfile and key bindings could be configured
+        permanently in a screen RC file.
+
 ==============================================================================
 OPTIONS                                                        *logbuch-options*
 
