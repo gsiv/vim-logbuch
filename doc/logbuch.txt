@@ -113,7 +113,9 @@ a buffer.
 
 *<leader>lx*                                         <Plug>(logbuch-screen-copy)
 
-        Write the visual selection to the screen exchange file.
+        Write the visual selection to the screen exchange file.  The selection
+        is automatically modified as if |<leader>lv| (see above) had been
+        pressed.
 
 *:LogbuchExchange*                                             *LogbuchExchange*
 
