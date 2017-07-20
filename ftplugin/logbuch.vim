@@ -310,8 +310,9 @@ function! s:NetrwNewHostSubstitutePrompt()
         return 0
     endif
     if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
+        echonn '\n'
         echohl LogbuchError
-        echo "\nERROR: Invalid regular expression.\n"
+        echom "ERROR: Invalid regular expression."
         echohl None
         return 1
     endif
@@ -419,14 +420,14 @@ function! s:SetUpScreenExchange()
     " XXX: There must be a more robust check
     if &shell != "/bin/bash" && &shell != "/bin/zsh"
         echohl LogbuchError
-        echo "ERROR: Unknown shell."
+        echom "ERROR: Unknown shell."
         echohl None
         return 1
     endif
     " Check if running in Screen session
     if l:termcap !~? "screen"
         echohl LogbuchError
-        echo "ERROR: No Screen session detected."
+        echom "ERROR: No Screen session detected."
         echohl None
         return 1
     endif
@@ -460,7 +461,7 @@ function! s:WriteToScreenExchangeFile()
     "      set in .screenrc, so this warning could get annoying.
     if !exists("g:logbuch_exchange_setup")
         echohl LogbuchWarning
-        echo "WARN: Screen may not be set up for pasting; run :LogbuchExchange?"
+        echom "WARN: Screen may not be set up for pasting; run :LogbuchExchange?"
         echohl None
     endif
 endfunction
