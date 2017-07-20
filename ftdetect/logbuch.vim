@@ -14,4 +14,6 @@
 " You should have received a copy of the GNU General Public License
 " along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-au BufNewFile,BufRead */logbuch.txt set filetype=logbuch
+autocmd BufNewFile,BufRead */logbuch.txt set filetype=logbuch
+autocmd BufNewFile,BufRead */etc/logbuch.txt echo "logbuch.vim loaded.  "
+      \ . "Type ':help logbuch' for more information."
