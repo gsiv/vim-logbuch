@@ -431,8 +431,6 @@ function! s:SetUpScreenExchange()
         echohl None
         return 1
     endif
-    call system('touch ' . shellescape(s:screen_exchange))
-    call system('chmod 660 ' . shellescape(s:screen_exchange))
     call system('screen -X bind ^e eval "readbuf '
                 \ . s:screen_exchange . '" "paste ."')
     " XXX: use shellescape
@@ -447,6 +445,10 @@ endfunction
 function! s:WriteToScreenExchangeFile()
     " Write selected logbuch text to screen exchange file.  This file can be
     " read into screen's paste buffer (readbuf, C-a<).
+
+    " Set exchange file access rights
+    call system('touch ' . shellescape(s:screen_exchange)
+                \ . ' && chmod 660 ' . shellescape(s:screen_exchange))
 
     call <SID>ModifyVisualSelection()
     let l:old_register = @l
