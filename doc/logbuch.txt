@@ -115,7 +115,7 @@ a buffer.
 
         Write the visual selection to the screen exchange file.
 
-*:LogbuchExchange*                                            *:LogbuchExchange*
+*:LogbuchExchange*                                             *LogbuchExchange*
 
         Prepare the current screen session for pasting from logbuch.vim by
         setting up a temporary screen exchange file in /tmp and configuring
