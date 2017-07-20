@@ -25,6 +25,8 @@ syntax clear
 syntax sync fromstart
 
 setlocal foldmethod=syntax
+setlocal foldtext=LogbuchFold(v:lnum)
+
 " Treat asterisks as regular list bullets, not multi-line comment prefixes
 setlocal comments-=mb:*
 setlocal comments+=fb:*

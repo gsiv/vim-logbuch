@@ -16,9 +16,6 @@
 
 scriptencoding utf-8
 
-setlocal foldmethod=expr
-setlocal foldtext=LogbuchFold(v:lnum) " in ftplugin
-
 " Pattern that matches beginnings of new logbuch entries
 let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
 
