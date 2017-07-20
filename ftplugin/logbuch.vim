@@ -122,11 +122,6 @@ function! s:set_default_key_maps()
     silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
 endfunction
 
-" {{{ Command definitions
-command LogbuchExchange call <SID>SetUpScreenExchange()
-" }}}
-
-
 if exists("g:logbuch_cfg_no_mapping")
     " if not disabled by user
     if g:logbuch_cfg_no_mapping != 1
@@ -141,6 +136,12 @@ if exists("g:loaded_logbuch_plugin")
   finish
 endif
 let g:loaded_logbuch_plugin = 1
+
+" {{{ Command definitions
+if !exists(":LogbuchExchange")
+    command LogbuchExchange call <SID>SetUpScreenExchange()
+endif
+" }}}
 
 " {{{ Functions
 
