@@ -465,10 +465,11 @@ function! s:WriteToScreenExchangeFile()
 
     " Check if SetUpScreenExchange() has run before
     " XXX: The Screen settings added by SetUpScreenExchange could already be
-    "      set in .screenrc, so this warning could get annoying.
+    "      set in .screenrc, so this warning could get annoying.  Perhaps it
+    "      should only be displayed once per Vim session?
     if !exists("g:logbuch_exchange_setup")
         echohl LogbuchWarning
-        echom "WARN: Screen may not be set up for pasting; run :LogbuchExchange?"
+        echo "Hint: Screen may not be set up for pasting; run :LogbuchExchange?"
         echohl None
     endif
 endfunction
