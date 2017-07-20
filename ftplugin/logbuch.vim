@@ -464,13 +464,19 @@ function! s:WriteToScreenExchangeFile()
     let @l = l:old_register
 
     " Check if SetUpScreenExchange() has run before
-    " XXX: The Screen settings added by SetUpScreenExchange could already be
-    "      set in .screenrc, so this warning could get annoying.  Perhaps it
-    "      should only be displayed once per Vim session?
     if !exists("g:logbuch_exchange_setup")
         echohl LogbuchWarning
         echo "Hint: Screen may not be set up for pasting; run :LogbuchExchange?"
         echohl None
+        " Mark this warning as seen, so it won't be displayed again.
+        "
+        " This variable was originally meant to signify if :LogbuchExchange
+        " was run; however since that was always optional, this warning would
+        " have probably gotten annoying.
+        "
+        " To restore the more nagging behavior, remove this variable
+        " assignment.
+        let g:logbuch_exchange_setup = 1
     endif
 endfunction
 
