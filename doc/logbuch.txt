@@ -81,7 +81,7 @@ This plugin extends netrw's functionality.
         Open an :edit prompt with the remote host part filled in.
 
 *<leader>gf*                                           <Plug>(logbuch-remote-gf)
-        Like *gf* but open the file path under the cursor on the remote
+        Like |gf| but open the file path under the cursor on the remote
         machine.
 
 *<leader>ln*                                     <Plug>(logbuch-remote-new-host)
@@ -111,7 +111,7 @@ The central feature is simply copying visual selections to a temporary file
 (bufferfile).  From there, screen can “slurp up” and paste the text into
 a buffer.
 
-*<leader>lx*                                       *<Plug>(logbuch-screen-copy)*
+*<leader>lx*                                         <Plug>(logbuch-screen-copy)
 
         Write the visual selection to the screen exchange file.
 
