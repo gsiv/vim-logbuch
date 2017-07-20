@@ -451,8 +451,15 @@ function! s:WriteToScreenExchangeFile()
     call <SID>ModifyVisualSelection()
     let l:old_register = @l
     " yank selection to register l
-    execute 'normal! "ly'
-    execute "edit" . s:screen_exchange . "| %d | 0put l | $d | w | bd" . s:screen_exchange
+    silent execute 'normal! "ly'
+    silent execute "edit" . s:screen_exchange . "| %d | 0put l | $d | w | bd" . s:screen_exchange
+
+    " Echo copied text
+    echohl LogbuchInfo
+    echo "Copied to exchange file:"
+    echohl None
+    echo @l
+
     " restore register l
     let @l = l:old_register
 

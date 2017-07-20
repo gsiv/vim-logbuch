@@ -46,6 +46,7 @@ hi def link   logbuchItemFile          Underlined
 hi def link   logbuchItemMarker        CursorLineNr
 
 " Formatting for script messages
+highlight default link LogbuchInfo Debug
 highlight default link LogbuchWarning WarningMsg
 highlight default link LogbuchError ErrorMsg
 " }}}
