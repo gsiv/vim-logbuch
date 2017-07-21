@@ -231,11 +231,11 @@ function! s:NewLogFromTemplate()
     if exists("g:logbuch_cfg_template_marker")
         " if not disabled by user
         if g:logbuch_cfg_template_marker != 0
-            call <SID>ManageMarker(0)
+            call <SID>ManageMarker('.', 1, 0)
         endif
     else
         " if no preference configured
-        call <SID>ManageMarker(0)
+        call <SID>ManageMarker('.', 1, 0)
     endif
 endfunction
 
@@ -341,25 +341,28 @@ function! s:InsertMarker(pos)
         let l:opt_insert_below = 0
         let l:insert_lnum = line('.') - 1
     endif
-    call <SID>ManageMarker(l:insert_lnum, l:opt_insert_below)
+    call <SID>ManageMarker(l:insert_lnum, l:opt_insert_below, 0)
 endfunction
 
-function! s:ManageMarker(line, pos)
+function! s:ManageMarker(line, pos, fromvisual)
     " Function to actually insert the marker line
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
     let l:wsv = winsaveview()
-    call append(a:line, l:marker)
+    let l:insert_lnum = a:line
+    call append(l:insert_lnum, l:marker)
     call winrestview(l:wsv)
 
     " The deletions happen separately because it is easier to restore the
     " cursor's expected position this way.
     let l:wsv = winsaveview()
-    let end_pos   = getpos("'>")
-    " Move to end of selection.  This is where the cursor would move anyway if
-    " we did the select, yank, set cursor actions manually.  Setting the
-    " position here explicitly is only necessary to be able to reuse the
-    " following expressions internally.
-    call setpos('.', end_pos)
+    if a:fromvisual == 1
+        " Move to end of selection.  This is where the cursor would move anyway if
+        " we did the select, yank, set cursor actions manually.  Setting the
+        " position here explicitly is only necessary to be able to reuse the
+        " following expressions internally.
+        let l:end_pos = line("'>")
+        call setpos('.', [0, l:end_pos, 0, 0])
+    endif
     " Delete previous markers
     if a:pos == 1
         let l:wsv = winsaveview()
@@ -437,7 +440,7 @@ function! s:YankToXSel()
     let l:old_register = @l
     " yank selection to register *
     silent execute 'normal! "*y'
-    call <SID>ManageMarker(line("'>"), 1)
+    call <SID>ManageMarker(line("'>"), 1, 1)
 endfunction
 
 function! s:SetUpScreenExchange()
@@ -488,11 +491,11 @@ function! s:WriteToScreenExchangeFile()
     if exists("g:logbuch_cfg_template_marker")
         " if not disabled by user
         if g:logbuch_cfg_template_marker != 0
-            call <SID>ManageMarker(line("'>"), 1)
+            call <SID>ManageMarker(line("'>"), 1, 1)
         endif
     else
         " if no preference configured
-        call <SID>ManageMarker(line("'>"), 1)
+        call <SID>ManageMarker(line("'>"), 1, 1)
     endif
 
     " Echo copied text
