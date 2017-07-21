@@ -45,7 +45,7 @@ hi def link   logbuchItemCmd           Statement
 hi def link   logbuchItemComment       Function
 hi def link   logbuchItemBody          Comment
 hi def link   logbuchItemFile          Underlined
-hi def link   logbuchItemMarker        CursorLineNr
+hi def link   logbuchItemMarker        Todo
 
 " Formatting for script messages
 highlight default link LogbuchInfo Debug
