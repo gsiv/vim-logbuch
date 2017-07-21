@@ -325,7 +325,7 @@ endfunction
 
 function! s:SetMarker(pos)
     " The deletions happen separately because it is easier to restore the
-    " cursors expected position this way.
+    " cursor's expected position this way.
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
     if a:pos == 1
         let l:opt_insert_below = 1
@@ -376,11 +376,13 @@ function! LogbuchFold(lnum)
         let line = printf('%s - %s - %s', date, author, content_line)
     else
         " default
-        let line = substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
+        let line = substitute(getline(v:foldstart),
+              \ '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
     endif
     let lines_count = v:foldend - v:foldstart + 1
     let lines_count_text = printf(" %s lines", lines_count)
-    let summary_line = strpart(line, 0, (winwidth(0)*2)/3) " cut line at 2/3 of window width
+    " cut line at 2/3 of window width
+    let summary_line = strpart(line, 0, (winwidth(0)*2)/3)
     " length of sting(s) that will have to fit on screen
     let foldtextlength = strlen(substitute(summary_line . lines_count_text,
                 \'.', 'x', 'g')) + &foldcolumn
@@ -413,18 +415,18 @@ endfunction
 function! s:SetUpScreenExchange()
     " Prepare the screen-exchange file and define screen bindings
     let l:termcap=system('env | grep TERMCAP')
+    " Check if running in Screen session
+    if l:termcap !~? "screen"
+        echohl LogbuchError
+        echom "ERROR: No Screen session detected."
+        echohl None
+        return 1
+    endif
     " Check if running in known shell
     " XXX: There must be a more robust check
     if &shell != "/bin/bash" && &shell != "/bin/zsh"
         echohl LogbuchError
         echom "ERROR: Unknown shell."
-        echohl None
-        return 1
-    endif
-    " Check if running in Screen session
-    if l:termcap !~? "screen"
-        echohl LogbuchError
-        echom "ERROR: No Screen session detected."
         echohl None
         return 1
     endif
@@ -451,7 +453,8 @@ function! s:WriteToScreenExchangeFile()
     let l:old_register = @l
     " yank selection to register l
     silent execute 'normal! "ly'
-    silent execute "edit" . s:screen_exchange . "| %d | 0put l | $d | w | bd" . s:screen_exchange
+    silent execute "edit" . s:screen_exchange .
+          \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
 
     " Echo copied text
     echohl LogbuchInfo
