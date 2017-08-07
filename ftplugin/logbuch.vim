@@ -392,7 +392,7 @@ function! LogbuchFold(lnum)
         let headline = getline(v:foldstart)
         let date = matchstr(headline, '[0-9\.]\+')
         " let author = matchstr(headline, '[a-zA-Z-\ ]\+\ze\ <') " full name
-        let author = matchstr(headline, '\zs[a-zA-Z-]\+\ze\ ') " first name
+        let author = matchstr(headline, '\zs[a-zA-Z-]\+\ze\ \?') " first name
         let email = matchstr(headline, '<.*>')
         let content_line = getline(v:foldstart + 1)
         let content_line = substitute(content_line, '\s*\*\s', '', '')
