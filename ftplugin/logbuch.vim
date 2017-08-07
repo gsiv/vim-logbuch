@@ -83,18 +83,23 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-remote-substitute-host)
 
 " Set marker line
 noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
-        \ :<C-u>call <SID>SetMarker(0)<CR>
+        \ :<C-u>call <SID>InsertMarker(0)<CR>
 noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-below)
-        \ :<C-u>call <SID>SetMarker(1)<CR>
+        \ :<C-u>call <SID>InsertMarker(1)<CR>
 
 " Modify visual selection
 noremap <script> <buffer> <silent> <Plug>(logbuch-modify-selection)
         \ :<C-u>call <SID>ModifyVisualSelection()<CR>
 
+" Yank text to X selection
+noremap <script> <buffer> <silent> <Plug>(logbuch-yank-to-xselection)
+        \ :<C-u>call <SID>YankToXSel()<CR>
+
 " No-X Editing:
 " Mapping for interaction with screen's copy/paste buffer:
 noremap <script> <buffer> <silent> <Plug>(logbuch-write-screenexchange)
         \ :<C-u>call <SID>WriteToScreenExchangeFile()<CR>
+
 
 " }}}
 " {{{ Default mappings
@@ -111,12 +116,15 @@ function! s:set_default_key_maps()
     silent execute 'map <buffer> <leader>gf  <Plug>(logbuch-remote-gf)'
     silent execute 'map <buffer> <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
 
-    silent execute 'vmap <buffer> <leader>lv <Plug>(logbuch-modify-selection)'
+    " silent execute 'vmap <buffer> <leader>lv <Plug>(logbuch-modify-selection)'
     silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
     silent execute 'map <buffer> <leader>ln  <Plug>(logbuch-remote-new-host)'
     silent execute 'map <buffer> <leader>lN  <Plug>(logbuch-remote-substitute-host)'
 
+    " Copying
+    silent execute 'vmap <leader>ly <Plug>(logbuch-yank-to-xselection)'
     silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
+
 endfunction
 
 if exists("g:logbuch_cfg_no_mapping")
@@ -223,11 +231,11 @@ function! s:NewLogFromTemplate()
     if exists("g:logbuch_cfg_template_marker")
         " if not disabled by user
         if g:logbuch_cfg_template_marker != 0
-            call <SID>SetMarker(0)
+            call <SID>ManageMarker('.', 1, 0)
         endif
     else
         " if no preference configured
-        call <SID>SetMarker(0)
+        call <SID>ManageMarker('.', 1, 0)
     endif
 endfunction
 
@@ -323,10 +331,9 @@ function! s:NetrwNewHostSubstitutePrompt()
     execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
 
-function! s:SetMarker(pos)
-    " The deletions happen separately because it is easier to restore the
-    " cursor's expected position this way.
-    let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
+function! s:InsertMarker(pos)
+    " Function for the insert marker mappings (logbuch-todo-marker-above
+    " & logbuch-todo-marker-below).
     if a:pos == 1
         let l:opt_insert_below = 1
         let l:insert_lnum = line('.')
@@ -334,14 +341,30 @@ function! s:SetMarker(pos)
         let l:opt_insert_below = 0
         let l:insert_lnum = line('.') - 1
     endif
+    call <SID>ManageMarker(l:insert_lnum, l:opt_insert_below, 0)
+endfunction
 
+function! s:ManageMarker(line, pos, fromvisual)
+    " Function to actually insert the marker line
+    let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
     let l:wsv = winsaveview()
+    let l:insert_lnum = a:line
     call append(l:insert_lnum, l:marker)
     call winrestview(l:wsv)
 
+    " The deletions happen separately because it is easier to restore the
+    " cursor's expected position this way.
     let l:wsv = winsaveview()
+    if a:fromvisual == 1
+        " Move to end of selection.  This is where the cursor would move anyway if
+        " we did the select, yank, set cursor actions manually.  Setting the
+        " position here explicitly is only necessary to be able to reuse the
+        " following expressions internally.
+        let l:end_pos = line("'>")
+        call setpos('.', [0, l:end_pos, 0, 0])
+    endif
     " Delete previous markers
-    if l:opt_insert_below == 1
+    if a:pos == 1
         let l:wsv = winsaveview()
         silent execute "?" . s:dateline_pattern . "?,.-0g/" . l:marker . "/d"
         call winrestview(l:wsv)
@@ -412,6 +435,14 @@ function! s:ModifyVisualSelection()
     execute "normal! $h"
 endfunction
 
+function! s:YankToXSel()
+    call <SID>ModifyVisualSelection()
+    let l:old_register = @l
+    " yank selection to register *
+    silent execute 'normal! "*y'
+    call <SID>ManageMarker(line("'>"), 1, 1)
+endfunction
+
 function! s:SetUpScreenExchange()
     " Prepare the screen-exchange file and define screen bindings
     let l:termcap=system('env | grep TERMCAP')
@@ -455,6 +486,17 @@ function! s:WriteToScreenExchangeFile()
     silent execute 'normal! "ly'
     silent execute "edit" . s:screen_exchange .
           \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
+
+    " (Maybe) insert TODO marker
+    if exists("g:logbuch_cfg_template_marker")
+        " if not disabled by user
+        if g:logbuch_cfg_template_marker != 0
+            call <SID>ManageMarker(line("'>"), 1, 1)
+        endif
+    else
+        " if no preference configured
+        call <SID>ManageMarker(line("'>"), 1, 1)
+    endif
 
     " Echo copied text
     echohl LogbuchInfo
