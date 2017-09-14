@@ -40,8 +40,8 @@ hi def link   logbuchPreambleItem      PreProc
 hi def link   logbuchPreambleSection   Todo
 hi def link   logbuchTitleHostname     ErrorMsg
 hi def link   logbuchTitleIP           Number
-hi def link   logbuchItemBullet        String
-hi def link   logbuchItemCmd           Statement
+hi def link   logbuchItemBullet        Statement
+hi def link   logbuchItemCmd           Normal
 hi def link   logbuchItemComment       Function
 hi def link   logbuchItemBody          Comment
 hi def link   logbuchItemFile          Underlined
@@ -81,10 +81,11 @@ syntax region logbuchItem start=/^\*\s/
             \ end=/[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t/me=s-1
             \ fold transparent contained contains=logbuchItem.\+
 syntax match  logbuchItemCmd /.\+$/ contained
-            \ contains=logbuchItemComment,logbuchItemFile
+            \ contains=logbuchItemBullet,logbuchItemComment,logbuchItemFile
 syntax match  logbuchItemBody /^\s\s\+.*$/ contained
             \ contains=logbuchItemComment,logbuchItemFile
 syntax match  logbuchItemComment /#\s.*$/ contained
+syntax match  logbuchItemBullet /^\* / contained
 " TODO: improve:
 syntax match  logbuchItemFile /[~\/\.]\+.\+:$/ contained
 syntax match  logbuchItemMarker
