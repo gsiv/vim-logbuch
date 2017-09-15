@@ -437,10 +437,14 @@ endfunction
 
 function! s:YankToXSel()
     call <SID>ModifyVisualSelection()
-    let l:old_register = @l
     " yank selection to register *
     silent execute 'normal! "*y'
     call <SID>ManageMarker(line("'>"), 1, 1)
+    " Echo copied text
+    echohl LogbuchInfo
+    echo "Copied to register *:"
+    echohl None
+    echo @*
 endfunction
 
 function! s:SetUpScreenExchange()
