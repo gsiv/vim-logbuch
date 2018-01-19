@@ -457,6 +457,12 @@ function! s:SetUpScreenExchange()
         echohl None
         return 1
     endif
+
+    " Set 'hidden' to allow automatic switching to the temporary file.
+    if &hidden == 0
+        setlocal hidden
+    endif
+
     call system('screen -X bind ^e eval "readbuf '
                 \ . s:screen_exchange . '" "paste ."')
     " XXX: use shellescape
