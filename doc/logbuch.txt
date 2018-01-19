@@ -101,6 +101,8 @@ This plugin extends netrw's functionality.
 ------------------------------------------------------------------------------
 WORKING IN SCREEN SESSIONS                                      *logbuch-screen*
 
+WARNING: This is feature is experimental and has seen very little use!
+
 logbuch.vim can interact with a GNU screen session for easier copy & pasting
 from Vim to the shell.
 
@@ -123,6 +125,10 @@ a buffer.
 
           1) e   Preview the contents of the screen exchange file
           2) ^e  Paste the contents of the exchange file into the buffer
+
+        NOTE: Due to the way GNU screen slurps up the exchange file, there is
+        no way to paste text without a carriage return.  This is a big
+        difference to the way how |logbuch-yank-to-xselection| works.
 
         :LogbuchExchange usually only has to be run once per screen session.
         Alternatively, the bufferfile and key bindings could be configured
