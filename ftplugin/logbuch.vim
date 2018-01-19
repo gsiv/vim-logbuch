@@ -457,14 +457,6 @@ function! s:SetUpScreenExchange()
         echohl None
         return 1
     endif
-    " Check if running in known shell
-    " XXX: There must be a more robust check
-    if &shell != "/bin/bash" && &shell != "/bin/zsh"
-        echohl LogbuchError
-        echom "ERROR: Unknown shell."
-        echohl None
-        return 1
-    endif
     call system('screen -X bind ^e eval "readbuf '
                 \ . s:screen_exchange . '" "paste ."')
     " XXX: use shellescape
