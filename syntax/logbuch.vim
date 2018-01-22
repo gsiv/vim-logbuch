@@ -76,9 +76,7 @@ syntax region logbuchTitleIP start=/(/ms=e+1 end=/)/me=s-1 contained
 syntax region logbuchEntry start=/^[0-9]/ end=/^[0-9]/me=s-1 end=/^$/me=s-1
             \ fold transparent contains=logbuchDate,logbuchItem fold
 syntax region logbuchItem start=/^\*\s/
-            \ end=/^\*\s/me=s-1
             \ end=/^\S/me=s-1
-            \ end=/[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t/me=s-1
             \ fold transparent contained contains=logbuchItem.\+
 syntax match  logbuchItemCmd /.\+$/ contained
             \ contains=logbuchItemBullet,logbuchItemComment,logbuchItemFile
