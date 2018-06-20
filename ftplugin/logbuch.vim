@@ -80,6 +80,9 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-remote-new-host)
 " Open an :edit prompt for a new host after applying regex substitution
 noremap <script> <buffer> <silent> <Plug>(logbuch-remote-substitute-host)
         \ :<C-u>call <SID>NetrwNewHostSubstitutePrompt()<CR>
+" Reload the current buffer (:edit)
+noremap <script> <buffer> <silent> <Plug>(logbuch-remote-reload-buffer)
+        \ :<C-u>call <SID>NetrwRefreshTimestampOnEdit()<CR>
 
 " Set marker line
 noremap <script> <buffer> <silent> <Plug>(logbuch-todo-marker-above)
@@ -115,6 +118,7 @@ function! s:set_default_key_maps()
 
     silent execute 'map <buffer> <leader>gf  <Plug>(logbuch-remote-gf)'
     silent execute 'map <buffer> <leader>ge  <Plug>(logbuch-remote-edit-prompt)'
+    silent execute 'map <buffer> <leader>gr  <Plug>(logbuch-remote-reload-buffer)'
 
     " silent execute 'vmap <buffer> <leader>lv <Plug>(logbuch-modify-selection)'
     silent execute 'map <buffer> <leader>ll  <Plug>(logbuch-todo-marker-above)'
@@ -137,6 +141,11 @@ else
 endif
 " }}}
 
+if !exists("g:logbuch_mod_times")
+    " Init modification time array
+    let g:logbuch_mod_times = {}
+endif
+
 if exists("g:loaded_logbuch_plugin")
   finish
 endif
@@ -146,6 +155,7 @@ let g:loaded_logbuch_plugin = 1
 if !exists(":LogbuchExchange")
     command LogbuchExchange call <SID>SetUpScreenExchange()
 endif
+
 " }}}
 
 " {{{ Functions
@@ -526,6 +536,105 @@ function! s:WriteToScreenExchangeFile()
     endif
 endfunction
 
+" }}}
+
+function! s:NetrwCheckModified(record_new)
+    " Fetch modification time of remote file via SSH and compare it to
+    " a previous timestamp if possible.
+    if expand("%") =~ "^scp:\/\/"
+        let l:buff  = expand("%")
+        let l:netrw_host = s:NetrwHost()
+        " strip protocol
+        let l:hostname = substitute(l:netrw_host, "^[^\/]*", "", "")
+        " strip remaining slashes around hostname
+        let l:hostname = substitute(l:hostname, "\/", "", "g")
+        " get file path by removing protocol+hostname
+        let l:path = substitute(l:buff, l:netrw_host, "", "")
+
+        " modified time via SSH
+        " echom "Running SSH " . a:record_new
+        let l:m = system("ssh " . l:hostname . " \"stat -c '%Y' "
+                    \ . l:path .  "\"")
+        if a:record_new == 0 && has_key(g:logbuch_mod_times, l:buff)
+            " Compare
+            if l:m != g:logbuch_mod_times[l:buff]
+                return 1
+            endif
+        endif
+        " Add/update timestamp
+        " echom "updating timestamp: " l:buff . l:m
+        let g:logbuch_mod_times[l:buff] = l:m
+        return 0
+    else
+        " This has only been implemented for scp
+        return 0
+    endif
+endfunction
+
+" BufWriteCmd idea
+function! s:NetrwCarefulWrite(path)
+    " This function replaces the regular BufWriteCmd for SCP remote files.  It
+    " attempts to implement a file time modification check for remote files
+    " like Vim already uses for local files.
+    "
+    " The check involves querying the remote via SSH before and after a write
+    " to get the exact timestamp of the remote filesystem.  This could
+    " probably be made a little more efficient by skipping the record-on-write
+    " step.  Instead, the local systems times could be used and the check for
+    " conflicting changes could be made a little fuzzier.  For now, the both
+    " simpler and safer method seems preferable.
+    let l:check = <SID>NetrwCheckModified(0)
+    if l:check == 1
+        " TODO: Copy wording of original Vim warning
+        echohl LogbuchError
+        echom "ERROR: Remote file appears to have changed!  Overwrite? [y/N] "
+        echohl None
+        let l:response = nr2char(getchar())
+        if l:response !=? "y"
+          echohl LogbuchError
+          echom "File not saved!"
+          echohl None
+          return 1
+        endif
+    endif
+
+    " There is no need to handle BufWritePre and Post because Nwrite takes
+    " care of that.
+    execute 'Nwrite ' . a:path
+    " Record new modification time
+    call <SID>NetrwCheckModified(1)
+endfunction
+
+function! s:NetrwRefreshTimestampOnEdit()
+    " This function is a workaround for the CarefulWrite conecpt.
+    " CarefulWrite can automatically check the remote file's modification time
+    " by highjacking Netrw's BufWrite autocommand.
+    " I can't get it to work for :edit/BufRead, however.
+    "
+    " For now, we'll have to make do with a separate command from :edit that
+    " does nothing but record the new timestamp and then run :edit.
+    if &modified
+        " Print the same error as the :edit command in this situation
+        echohl LogbuchError
+        echom "E37: No write since last change (add ! to override)"
+        echohl None
+        return 1
+    else
+        execute "edit"
+        call <SID>NetrwCheckModified(1)
+    endif
+endfunction
+
+" Record initial modification time
+" Ideally, this wouldn't need to be here but instead be called from something
+" like a BufRead autocommand.  That doesn't work yet, however.
+call <SID>NetrwCheckModified(0)
+
+" {{{ Autocommands
+" XXX: overrides default netrw autocommand
+autocmd! Network BufWriteCmd scp://* call <SID>NetrwCarefulWrite(expand("<afile>:p"))
+" XXX: There is no BufRead equivalent (yet?); instead, there is
+" NetrwRefreshTimestampOnEdit()
 " }}}
 
 " vim: fdm=marker et sw=4 ts=4
