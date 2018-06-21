@@ -9,7 +9,7 @@ logbuch.txt files.
 ==============================================================================
 LICENSE                                                        *logbuch-license*
 
-logbuch.vim Copyright © 2016, 2017 Gernot Schulz <gernot@intevation.de>
+logbuch.vim Copyright © 2016–2018 Gernot Schulz <gernot@intevation.de>
 Licensed under the GNU General Public License (GPL), version 2 or later.
 Absolutely no warranty, see COPYING file for details.
 
@@ -72,7 +72,7 @@ This plugins provides the following normal and visual mode navigation mappings:
 REMOTELY EDITING LOGBUCH FILES                                  *logbuch-remote*
 
 If the |netrw| plugin is available, Vim can edit logbuch files remotely.
-This plugin extends netrw's functionality.
+This plugin extends netrw's SCP functionality.
 
 *<leader>ge*                                  <Plug>(logbuch-remote-edit-prompt)
         Open an :edit prompt with the remote host part filled in.
@@ -80,6 +80,12 @@ This plugin extends netrw's functionality.
 *<leader>gf*                                           <Plug>(logbuch-remote-gf)
         Like |gf| but open the file path under the cursor on the remote
         machine.
+
+*<leader>gr*                                  <Plug>(logbuch-remote-reload-buffer)
+        Reload the current file.  This is exactly the same as executing
+        |:edit| but if *g:logbuch_cfg_careful_scp* is enabled (see OPTIONS
+        below) the remote file's new modification timestamp is recorded as
+        well.
 
 *<leader>ln*                                     <Plug>(logbuch-remote-new-host)
         Open an :edit prompt for a logbuch.txt on a new remote host.
@@ -96,6 +102,13 @@ This plugin extends netrw's functionality.
         prompt: >
 
           :edit scp://root@db1.example.com//etc/logbuch.txt
+
+WARNING: By default, you will not notice conflicting changes to files edited
+via SCP!  If there is a chance that another person may be editing the same
+remote logbuch.txt be very cautious.
+
+It is recommended to enable logbuch.vim's experimental safety feature to help
+prevent write conflicts and data loss (see OPTIONS below).
 <
 
 ------------------------------------------------------------------------------
@@ -154,5 +167,23 @@ Disabling this feature: >
 
   let g:logbuch_cfg_template_marker = 0
 <
+                                                 *g:logbuch_cfg_careful_scp*
+This feature attempts to prevent data loss when editing files via SCP by
+adding modification time checks.
+
+On local filesystems, Vim checks the modification time of files to be written
+and warns if they have been touched outside of Vim.  For SCP, this safety
+feature does not exist.  The current buffer is always written to the remote
+file and conflicting edits go unnoticed.
+
+If enabled, logbuch.vim will connect to the remote host via SSH and compare
+the remote file's modification time.  These checks happen relatively often,
+e.g., twice per write, so depending on your setup this may be inefficient and
+even entirely impractical.  Ideally, you would have a key-based login and use
+SSH multiplexing for this feautre.
+
+Enabling this feature: >
+
+  let g:logbuch_cfg_careful_scp = 1
 
  vim:tw=78:et:ft=help:norl:
