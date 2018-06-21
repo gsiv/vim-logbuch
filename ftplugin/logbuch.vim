@@ -158,8 +158,8 @@ endif
 
 " }}}
 
-" {{{ Functions
-
+" {{{1 Functions
+" {{{2 Basic
 function! s:NextLog(type, backwards, visual)
     let l:vcount = v:count1
     if a:visual
@@ -247,98 +247,6 @@ function! s:NewLogFromTemplate()
         " if no preference configured
         call <SID>ManageMarker('.', 1, 0)
     endif
-endfunction
-
-" extact <protocol>://<host> from filename
-function! s:NetrwHost()
-    let l:filename = expand("%")
-    " hostname pattern:       | protocol |   hostname    |optional port |
-    let l:hostname_pattern = "^[a-z]\\+://[a-z0-9-\\.@]\\+\\(:[0-9]\\+\\)*"
-    if l:filename =~? l:hostname_pattern
-        let l:netrw_host = fnamemodify(l:filename,
-                    \":s?\\(" . l:hostname_pattern . "\/\\).*?\\1?")
-        return l:netrw_host
-    endif
-        return ""
-endfunction
-
-" Open file under cursor; like `:e <cfile>` but open on same host as current
-" file if using netrw
-function! s:RemoteGF()
-    let l:netrw_host = s:NetrwHost()
-    if netrw_host != ""
-        let l:linked_file = l:netrw_host . expand("<cfile>")
-        execute 'edit ' . fnameescape(l:linked_file)
-    else
-        execute 'edit <cfile>'
-    endif
-endfunction
-
-" Open an :edit prompt with the remote (<protocol>://<host>) filled in
-function! s:NetrwEditFilePrompt()
-    let l:netrw_host = s:NetrwHost()
-    if l:netrw_host != ""
-        let l:path = input("Edit file on " . l:netrw_host . ": ", "")
-        if l:path != ""
-            execute "edit " . l:netrw_host . "/" . l:path
-        endif
-    else
-        " If no netrw host was found, offer a normal :edit prompt.  Actually,
-        " this kind of recreates an :edit prompt; there is probably a better
-        " way to enter the actual command line.
-        let l:path = input(":edit ", "", "file")
-        if l:path != ""
-            execute "edit " . l:path
-        endif
-    endif
-endfunction
-
-" Open an :edit prompt for a new host
-function! s:NetrwNewHostPrompt()
-    let l:new_host = input("Edit logbuch on host: ", "scp://root@")
-    " return of aborted
-    if len(l:new_host) == 0
-        " clear prompt
-        normal :<ESC>
-        return 0
-    endif
-    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
-endfunction
-
-" Open an :edit prompt for a new host.  Unlike NetrwNewHostPrompt the new
-" hostname is not given directly but determined by a regex that modifies the
-" current hostname.
-function! s:NetrwNewHostSubstitutePrompt()
-    let l:netrw_host = s:NetrwHost()
-    let l:regex_input = input("Substitute in hostname: s/", "")
-    " This is a dumb regex parser.  It won't recognize escaped slashes or
-    " allow alternative separators like Vim would.  Considering that it will
-    " only ever be used for hostnames this should be okay.  There should also
-    " be no confusion regarding the separators because we dictate '/' in the
-    " prompt.
-    let l:hostname_subst = split(l:regex_input, '/')
-    " Check for correct number of arguments
-    if len(l:hostname_subst) == 0
-        " clear prompt
-        " redraw!
-        normal :<ESC>
-        return 0
-    endif
-    if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
-        echonn '\n'
-        echohl LogbuchError
-        echom "ERROR: Invalid regular expression."
-        echohl None
-        return 1
-    endif
-    " substitute() flag in case it was given
-    let l:subst_flag = ''
-    if len(l:hostname_subst) == 3
-        let l:subst_flag = l:hostname_subst[2]
-    endif
-    let l:new_host = substitute(l:netrw_host, l:hostname_subst[0],
-                \ l:hostname_subst[1], subst_flag)
-    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
 
 function! s:InsertMarker(pos)
@@ -456,87 +364,100 @@ function! s:YankToXSel()
     echohl None
     echo @*
 endfunction
+" 2}}}
 
-function! s:SetUpScreenExchange()
-    " Prepare the screen-exchange file and define screen bindings
-    let l:termcap=system('env | grep TERMCAP')
-    " Check if running in Screen session
-    if l:termcap !~? "screen"
+" {{{2 Remote editing (Netrw)
+" extact <protocol>://<host> from filename
+function! s:NetrwHost()
+    let l:filename = expand("%")
+    " hostname pattern:       | protocol |   hostname    |optional port |
+    let l:hostname_pattern = "^[a-z]\\+://[a-z0-9-\\.@]\\+\\(:[0-9]\\+\\)*"
+    if l:filename =~? l:hostname_pattern
+        let l:netrw_host = fnamemodify(l:filename,
+                    \":s?\\(" . l:hostname_pattern . "\/\\).*?\\1?")
+        return l:netrw_host
+    endif
+        return ""
+endfunction
+
+" Open file under cursor; like `:e <cfile>` but open on same host as current
+" file if using netrw
+function! s:RemoteGF()
+    let l:netrw_host = s:NetrwHost()
+    if netrw_host != ""
+        let l:linked_file = l:netrw_host . expand("<cfile>")
+        execute 'edit ' . fnameescape(l:linked_file)
+    else
+        execute 'edit <cfile>'
+    endif
+endfunction
+
+" Open an :edit prompt with the remote (<protocol>://<host>) filled in
+function! s:NetrwEditFilePrompt()
+    let l:netrw_host = s:NetrwHost()
+    if l:netrw_host != ""
+        let l:path = input("Edit file on " . l:netrw_host . ": ", "")
+        if l:path != ""
+            execute "edit " . l:netrw_host . "/" . l:path
+        endif
+    else
+        " If no netrw host was found, offer a normal :edit prompt.  Actually,
+        " this kind of recreates an :edit prompt; there is probably a better
+        " way to enter the actual command line.
+        let l:path = input(":edit ", "", "file")
+        if l:path != ""
+            execute "edit " . l:path
+        endif
+    endif
+endfunction
+
+" Open an :edit prompt for a new host
+function! s:NetrwNewHostPrompt()
+    let l:new_host = input("Edit logbuch on host: ", "scp://root@")
+    " return of aborted
+    if len(l:new_host) == 0
+        " clear prompt
+        normal :<ESC>
+        return 0
+    endif
+    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
+endfunction
+
+" Open an :edit prompt for a new host.  Unlike NetrwNewHostPrompt the new
+" hostname is not given directly but determined by a regex that modifies the
+" current hostname.
+function! s:NetrwNewHostSubstitutePrompt()
+    let l:netrw_host = s:NetrwHost()
+    let l:regex_input = input("Substitute in hostname: s/", "")
+    " This is a dumb regex parser.  It won't recognize escaped slashes or
+    " allow alternative separators like Vim would.  Considering that it will
+    " only ever be used for hostnames this should be okay.  There should also
+    " be no confusion regarding the separators because we dictate '/' in the
+    " prompt.
+    let l:hostname_subst = split(l:regex_input, '/')
+    " Check for correct number of arguments
+    if len(l:hostname_subst) == 0
+        " clear prompt
+        " redraw!
+        normal :<ESC>
+        return 0
+    endif
+    if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
+        echonn '\n'
         echohl LogbuchError
-        echom "ERROR: No Screen session detected."
+        echom "ERROR: Invalid regular expression."
         echohl None
         return 1
     endif
-
-    " Set 'hidden' to allow automatic switching to the temporary file.
-    if &hidden == 0
-        setlocal hidden
+    " substitute() flag in case it was given
+    let l:subst_flag = ''
+    if len(l:hostname_subst) == 3
+        let l:subst_flag = l:hostname_subst[2]
     endif
-
-    call system('screen -X bind ^e eval "readbuf '
-                \ . s:screen_exchange . '" "paste ."')
-    " XXX: use shellescape
-    call system('screen -X bind e eval "screen -t LogbuchExchange-preview" '
-                \ . '"stuff ''more '
-                \ . s:screen_exchange
-                \ . ' # Contents of ' .  s:screen_exchange
-                \ . '\n''"')
-    let g:logbuch_exchange_setup = 1
+    let l:new_host = substitute(l:netrw_host, l:hostname_subst[0],
+                \ l:hostname_subst[1], subst_flag)
+    execute input("", ":edit " . l:new_host . "//etc/logbuch.txt")
 endfunction
-
-function! s:WriteToScreenExchangeFile()
-    " Write selected logbuch text to screen exchange file.  This file can be
-    " read into screen's paste buffer (readbuf, C-a<).
-
-    " Set exchange file access rights
-    call system('touch ' . shellescape(s:screen_exchange)
-                \ . ' && chmod 660 ' . shellescape(s:screen_exchange))
-
-    call <SID>ModifyVisualSelection()
-    let l:old_register = @l
-    " yank selection to register l
-    silent execute 'normal! "ly'
-    silent execute "edit" . s:screen_exchange .
-          \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
-
-    " (Maybe) insert TODO marker
-    if exists("g:logbuch_cfg_template_marker")
-        " if not disabled by user
-        if g:logbuch_cfg_template_marker != 0
-            call <SID>ManageMarker(line("'>"), 1, 1)
-        endif
-    else
-        " if no preference configured
-        call <SID>ManageMarker(line("'>"), 1, 1)
-    endif
-
-    " Echo copied text
-    echohl LogbuchInfo
-    echo "Copied to exchange file:"
-    echohl None
-    echo @l
-
-    " restore register l
-    let @l = l:old_register
-
-    " Check if SetUpScreenExchange() has run before
-    if !exists("g:logbuch_exchange_setup")
-        echohl LogbuchWarning
-        echo "Hint: Screen may not be set up for pasting; run :LogbuchExchange?"
-        echohl None
-        " Mark this warning as seen, so it won't be displayed again.
-        "
-        " This variable was originally meant to signify if :LogbuchExchange
-        " was run; however since that was always optional, this warning would
-        " have probably gotten annoying.
-        "
-        " To restore the more nagging behavior, remove this variable
-        " assignment.
-        let g:logbuch_exchange_setup = 1
-    endif
-endfunction
-
-" }}}
 
 function! s:NetrwCheckModified(record_new)
     " Fetch modification time of remote file via SSH and compare it to
@@ -636,6 +557,89 @@ function! s:NetrwRefreshTimestampOnEdit()
         call <SID>NetrwCheckModified(1)
     endif
 endfunction
+" 2}}}
+
+" {{{2 Screen
+function! s:SetUpScreenExchange()
+    " Prepare the screen-exchange file and define screen bindings
+    let l:termcap=system('env | grep TERMCAP')
+    " Check if running in Screen session
+    if l:termcap !~? "screen"
+        echohl LogbuchError
+        echom "ERROR: No Screen session detected."
+        echohl None
+        return 1
+    endif
+
+    " Set 'hidden' to allow automatic switching to the temporary file.
+    if &hidden == 0
+        setlocal hidden
+    endif
+
+    call system('screen -X bind ^e eval "readbuf '
+                \ . s:screen_exchange . '" "paste ."')
+    " XXX: use shellescape
+    call system('screen -X bind e eval "screen -t LogbuchExchange-preview" '
+                \ . '"stuff ''more '
+                \ . s:screen_exchange
+                \ . ' # Contents of ' .  s:screen_exchange
+                \ . '\n''"')
+    let g:logbuch_exchange_setup = 1
+endfunction
+
+function! s:WriteToScreenExchangeFile()
+    " Write selected logbuch text to screen exchange file.  This file can be
+    " read into screen's paste buffer (readbuf, C-a<).
+
+    " Set exchange file access rights
+    call system('touch ' . shellescape(s:screen_exchange)
+                \ . ' && chmod 660 ' . shellescape(s:screen_exchange))
+
+    call <SID>ModifyVisualSelection()
+    let l:old_register = @l
+    " yank selection to register l
+    silent execute 'normal! "ly'
+    silent execute "edit" . s:screen_exchange .
+          \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
+
+    " (Maybe) insert TODO marker
+    if exists("g:logbuch_cfg_template_marker")
+        " if not disabled by user
+        if g:logbuch_cfg_template_marker != 0
+            call <SID>ManageMarker(line("'>"), 1, 1)
+        endif
+    else
+        " if no preference configured
+        call <SID>ManageMarker(line("'>"), 1, 1)
+    endif
+
+    " Echo copied text
+    echohl LogbuchInfo
+    echo "Copied to exchange file:"
+    echohl None
+    echo @l
+
+    " restore register l
+    let @l = l:old_register
+
+    " Check if SetUpScreenExchange() has run before
+    if !exists("g:logbuch_exchange_setup")
+        echohl LogbuchWarning
+        echo "Hint: Screen may not be set up for pasting; run :LogbuchExchange?"
+        echohl None
+        " Mark this warning as seen, so it won't be displayed again.
+        "
+        " This variable was originally meant to signify if :LogbuchExchange
+        " was run; however since that was always optional, this warning would
+        " have probably gotten annoying.
+        "
+        " To restore the more nagging behavior, remove this variable
+        " assignment.
+        let g:logbuch_exchange_setup = 1
+    endif
+endfunction
+" 2}}}
+" 1}}}
 
 " Record initial modification time
 " Ideally, this wouldn't need to be here but instead be called from something
