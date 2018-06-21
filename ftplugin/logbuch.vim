@@ -541,6 +541,18 @@ endfunction
 function! s:NetrwCheckModified(record_new)
     " Fetch modification time of remote file via SSH and compare it to
     " a previous timestamp if possible.
+
+    " Unless the option is explicitly enabled, don't do anything.  After some
+    " testing, this default behavior can hopefully be reversed.
+    if exists("g:logbuch_cfg_careful_scp")
+        " if disabled by user
+        if g:logbuch_cfg_careful_scp != 1
+            return 0
+        endif
+    else
+        return 0
+    endif
+
     if expand("%") =~ "^scp:\/\/"
         let l:buff  = expand("%")
         let l:netrw_host = s:NetrwHost()
