@@ -504,6 +504,54 @@ function! s:NetrwCheckModified(record_new)
     endif
 endfunction
 
+function! s:NetrwCheckRemoteSwap()
+    " Check via SSH if a Vim swap file is present at the remote, i.e.,
+    " .<filename>.swp.  This would indicate that someone else is editing the
+    " file which could lead to conflicts.  For local filesystems, Vim does
+    " this natively.
+
+    " Unless the option is explicitly enabled, don't do anything.  After some
+    " testing, this default behavior can hopefully be reversed.
+    if exists("g:logbuch_cfg_careful_scp")
+        " if disabled by user
+        if g:logbuch_cfg_careful_scp != 1
+            return 0
+        endif
+    else
+        return 0
+    endif
+
+    if expand("%") =~ "^scp:\/\/"
+        let l:buff  = expand("%")
+        let l:netrw_host = s:NetrwHost()
+        " strip protocol
+        let l:hostname = substitute(l:netrw_host, "^[^\/]*", "", "")
+        " strip remaining slashes around hostname
+        let l:hostname = substitute(l:hostname, "\/", "", "g")
+        " get file path by removing protocol+hostname
+        let l:path = substitute(l:buff, l:netrw_host, "", "")
+
+        " split path to insert period before filename
+        let l:path_list = split(l:path, '/\zs')
+        let l:swap_file = join(l:path_list[0:-2] +
+                    \ ["." . l:path_list[-1] . ".swp"], "")
+        let l:sshcmd = "test -f " . l:swap_file .
+                    \" && stat --printf '%y' " . l:swap_file
+        let l:m = system("ssh " . l:hostname .
+                    \ " \"test -f " . l:swap_file . ".swp && stat --printf '%y' "
+                    \ . l:swap_file . "\"")
+        if l:m != ""
+            " Use built-in Error instead of LogbuchError because the latter is
+            " not defined soon enough.  At least, currently this function is
+            " called once at the very beginning.
+            echohl Error
+            echom "ATTENTION: Found a swap file dated " . l:m . "!"
+            echohl None
+            return 1
+        endif
+    endif
+endfunction
+
 " BufWriteCmd idea
 function! s:NetrwCarefulWrite(path)
     " This function replaces the regular BufWriteCmd for SCP remote files.  It
@@ -645,6 +693,7 @@ endfunction
 " Ideally, this wouldn't need to be here but instead be called from something
 " like a BufRead autocommand.  That doesn't work yet, however.
 call <SID>NetrwCheckModified(0)
+call <SID>NetrwCheckRemoteSwap()
 
 " {{{ Autocommands
 " XXX: overrides default netrw autocommand
