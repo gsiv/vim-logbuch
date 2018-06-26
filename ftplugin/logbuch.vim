@@ -389,6 +389,10 @@ function! s:NetrwGetInfo(filename)
         return []
 endfunction
 
+function! s:NetrwSSHCmd(hostname, cmd)
+    return system("ssh " . a:hostname . " \"" . a:cmd . " \"")
+endfunction
+
 " Open file under cursor; like `:e <cfile>` but open on same host as current
 " file if using netrw
 function! s:RemoteGF()
@@ -491,9 +495,8 @@ function! s:NetrwCheckModified(record_new)
         let l:path     = l:conninfo[2]
 
         " modified time via SSH
-        " echom "Running SSH " . a:record_new
-        let l:m = system("ssh " . l:hostname . " \"stat -c '%Y' "
-                    \ . l:path .  "\"")
+        let l:sshcmd = "stat -c '%Y' " . l:path
+        let l:m = s:NetrwSSHCmd(l:hostname, l:sshcmd)
         if a:record_new == 0 && has_key(g:logbuch_mod_times, l:buff)
             " Compare
             if l:m != g:logbuch_mod_times[l:buff]
@@ -539,9 +542,7 @@ function! s:NetrwCheckRemoteSwap()
                     \ ["." . l:path_list[-1] . ".swp"], "")
         let l:sshcmd = "test -f " . l:swap_file .
                     \" && stat --printf '%y' " . l:swap_file
-        let l:m = system("ssh " . l:hostname .
-                    \ " \"test -f " . l:swap_file . ".swp && stat --printf '%y' "
-                    \ . l:swap_file . "\"")
+        let l:m = s:NetrwSSHCmd(l:hostname, l:sshcmd)
         if l:m != ""
             " Use built-in Error instead of LogbuchError because the latter is
             " not defined soon enough.  At least, currently this function is
