@@ -367,25 +367,35 @@ endfunction
 " 2}}}
 
 " {{{2 Remote editing (Netrw)
-" extact <protocol>://<host> from filename
-function! s:NetrwHost()
-    let l:filename = expand("%")
+function! s:NetrwGetInfo(filename)
+    " Return a list of protocol, hostname, filename, e.g.,
+    "['scp://', '127.1', '/etc/logbuch.txt'].
+
     " hostname pattern:       | protocol |   hostname    |optional port |
     let l:hostname_pattern = "^[a-z]\\+://[a-z0-9-\\.@]\\+\\(:[0-9]\\+\\)*"
-    if l:filename =~? l:hostname_pattern
-        let l:netrw_host = fnamemodify(l:filename,
+    if a:filename =~? l:hostname_pattern
+        let l:netrw_host = fnamemodify(a:filename,
                     \":s?\\(" . l:hostname_pattern . "\/\\).*?\\1?")
-        return l:netrw_host
+        " protocol
+        let l:protocol = substitute(l:netrw_host, "^\\w\\+://\\zs.*", "", "")
+        " strip protocol
+        let l:hostname = substitute(l:netrw_host, "^[^\/]*", "", "")
+        " strip remaining slashes around hostname
+        let l:hostname = substitute(l:hostname, "\/", "", "g")
+        " get file path by removing protocol+hostname
+        let l:path = substitute(a:filename, l:netrw_host, "", "")
+        return [l:protocol, l:hostname, l:path]
     endif
-        return ""
+        return []
 endfunction
 
 " Open file under cursor; like `:e <cfile>` but open on same host as current
 " file if using netrw
 function! s:RemoteGF()
-    let l:netrw_host = s:NetrwHost()
-    if netrw_host != ""
-        let l:linked_file = l:netrw_host . expand("<cfile>")
+    let l:netrw_host = s:NetrwGetInfo(expand('%'))
+    if ! empty(l:netrw_host)
+        let l:linked_file = l:netrw_host[0] . l:netrw_host[1]
+                    \ . "/" . expand("<cfile>")
         execute 'edit ' . fnameescape(l:linked_file)
     else
         execute 'edit <cfile>'
@@ -394,11 +404,11 @@ endfunction
 
 " Open an :edit prompt with the remote (<protocol>://<host>) filled in
 function! s:NetrwEditFilePrompt()
-    let l:netrw_host = s:NetrwHost()
-    if l:netrw_host != ""
-        let l:path = input("Edit file on " . l:netrw_host . ": ", "")
+    let l:netrw_host = s:NetrwGetInfo(expand('%'))
+    if ! empty(l:netrw_host)
+        let l:path = input("Edit file on " . l:netrw_host[1] . ": ", "")
         if l:path != ""
-            execute "edit " . l:netrw_host . "/" . l:path
+            execute "edit " . l:netrw_host[0] . l:netrw_host[1] . "/" . l:path
         endif
     else
         " If no netrw host was found, offer a normal :edit prompt.  Actually,
@@ -476,13 +486,9 @@ function! s:NetrwCheckModified(record_new)
 
     if expand("%") =~ "^scp:\/\/"
         let l:buff  = expand("%")
-        let l:netrw_host = s:NetrwHost()
-        " strip protocol
-        let l:hostname = substitute(l:netrw_host, "^[^\/]*", "", "")
-        " strip remaining slashes around hostname
-        let l:hostname = substitute(l:hostname, "\/", "", "g")
-        " get file path by removing protocol+hostname
-        let l:path = substitute(l:buff, l:netrw_host, "", "")
+        let l:conninfo = s:NetrwGetInfo(l:buff)
+        let l:hostname = l:conninfo[1]
+        let l:path     = l:conninfo[2]
 
         " modified time via SSH
         " echom "Running SSH " . a:record_new
@@ -523,13 +529,9 @@ function! s:NetrwCheckRemoteSwap()
 
     if expand("%") =~ "^scp:\/\/"
         let l:buff  = expand("%")
-        let l:netrw_host = s:NetrwHost()
-        " strip protocol
-        let l:hostname = substitute(l:netrw_host, "^[^\/]*", "", "")
-        " strip remaining slashes around hostname
-        let l:hostname = substitute(l:hostname, "\/", "", "g")
-        " get file path by removing protocol+hostname
-        let l:path = substitute(l:buff, l:netrw_host, "", "")
+        let l:conninfo = s:NetrwGetInfo(l:buff)
+        let l:hostname = l:conninfo[1]
+        let l:path     = l:conninfo[2]
 
         " split path to insert period before filename
         let l:path_list = split(l:path, '/\zs')
