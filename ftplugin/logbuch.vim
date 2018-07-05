@@ -441,7 +441,9 @@ endfunction
 " hostname is not given directly but determined by a regex that modifies the
 " current hostname.
 function! s:NetrwNewHostSubstitutePrompt()
-    let l:netrw_host = s:NetrwHost()
+    let l:netrw_host = s:NetrwGetInfo(expand('%'))
+    " protocol + hostname as string:
+    let l:netrw_host = join(l:netrw_host[:1], "")
     let l:regex_input = input("Substitute in hostname: s/", "")
     " This is a dumb regex parser.  It won't recognize escaped slashes or
     " allow alternative separators like Vim would.  Considering that it will
