@@ -459,7 +459,7 @@ function! s:NetrwNewHostSubstitutePrompt()
         return 0
     endif
     if len(l:hostname_subst) < 2 || len(l:hostname_subst) > 3
-        echonn '\n'
+        echon '\n'
         echohl LogbuchError
         echom "ERROR: Invalid regular expression."
         echohl None
