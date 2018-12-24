@@ -102,6 +102,9 @@ noremap <script> <buffer> <silent> <Plug>(logbuch-yank-to-xselection)
 " Mapping for interaction with screen's copy/paste buffer:
 noremap <script> <buffer> <silent> <Plug>(logbuch-write-screenexchange)
         \ :<C-u>call <SID>WriteToScreenExchangeFile()<CR>
+" tmux
+noremap <script> <buffer> <silent> <Plug>(logbuch-tmux-setpastebuffer)
+        \ :<C-u>call <SID>TmuxSetPasteBuffer()<CR>
 
 
 " }}}
@@ -128,6 +131,7 @@ function! s:set_default_key_maps()
     " Copying
     silent execute 'vmap <leader>ly <Plug>(logbuch-yank-to-xselection)'
     silent execute 'vmap <leader>lx <Plug>(logbuch-write-screenexchange)'
+    silent execute 'vmap <leader>lt <Plug>(logbuch-tmux-setpastebuffer)'
 
 endfunction
 
@@ -693,6 +697,48 @@ function! s:WriteToScreenExchangeFile()
     endif
 endfunction
 " 2}}}
+
+" {{{2 Tmux
+function! s:TmuxSetPasteBuffer()
+    " Load selected logbuch text into a tmux paste buffer.
+
+    let l:buffer_name = 'vim-logbuch'
+
+    call system('touch ' . shellescape(s:screen_exchange)
+                \ . ' && chmod 660 ' . shellescape(s:screen_exchange))
+
+    call <SID>ModifyVisualSelection()
+    let l:old_register = @l
+    " yank selection to register l
+    silent execute 'normal! "ly'
+    silent execute "edit" . s:screen_exchange .
+          \ "| setlocal nofixeol " .
+          \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
+    call system('tmux load-buffer -b ' . buffer_name . ' ' . s:screen_exchange)
+
+    " (Maybe) insert TODO marker
+    if exists("g:logbuch_cfg_template_marker")
+        " if not disabled by user
+        if g:logbuch_cfg_template_marker != 0
+            call <SID>ManageMarker(line("'>"), 1, 1)
+        endif
+    else
+        " if no preference configured
+        call <SID>ManageMarker(line("'>"), 1, 1)
+    endif
+
+    " Echo copied text
+    echohl LogbuchInfo
+    echo 'Copied to tmux buffer ' . buffer_name . ':'
+    echohl None
+    echo @l
+
+    " restore register l
+    let @l = l:old_register
+
+endfunction
+" 2}}}
+"
 " 1}}}
 
 " Record initial modification time

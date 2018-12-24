@@ -33,25 +33,6 @@ Default key mappings:
         Insert a TODO marker at the current position.  There can only be one
         marker per logbuch entry.
 
-*<leader>ly*                                  <Plug>(logbuch-yank-to-xselection)
-
-        Yank the visually selected text to the X selection register '*'.
-
-        If the selected text starts with an asterisk, the selection is first
-        modified to exclude it.  This enables you to copy only the executable
-        part of entries such as the following while still using quick linewise
-        selections.
-
-          * /bin/ls /home \
-            /etc          \
-            /usr
-
-        Additionally, the final newline will be excluded from the selection,
-        so in some cases (e.g., as with the above example) the command will
-        not be automatically executed after pasting it into a terminal
-        emulator.
-
-        Alternatively, see |logbuch-screen| below.
 
 ------------------------------------------------------------------------------
 NAVIGATION                                                  *logbuch-navigation*
@@ -111,10 +92,56 @@ It is recommended to enable logbuch.vim's experimental safety feature to help
 prevent write conflicts and data loss (see OPTIONS below).
 <
 
-------------------------------------------------------------------------------
-WORKING IN SCREEN SESSIONS                                      *logbuch-screen*
+==============================================================================
+COPY AND PASTE                                               *logbuch-copypaste*
 
-WARNING: This is feature is experimental and has seen very little use!
+------------------------------------------------------------------------------
+COPY AND PASTE USING X SELECTIONS                                 *logbuch-xsel*
+
+*<leader>ly*                                  <Plug>(logbuch-yank-to-xselection)
+
+        Yank the visually selected text to the X selection register '*'.
+
+        If the selected text starts with an asterisk, the selection is first
+        modified to exclude it.  This enables you to copy only the executable
+        part of entries such as the following while still using quick linewise
+        selections.
+
+          * /bin/ls /home \
+            /etc          \
+            /usr
+
+        Additionally, the final newline will be excluded from the selection,
+        so in some cases (e.g., as with the above example) the command will
+        not be automatically executed after pasting it into a terminal
+        emulator.
+
+------------------------------------------------------------------------------
+COPY AND PASTE IN TMUX SESSIONS                                   *logbuch-tmux*
+
+WARNING: This feature is experimental and has seen very little use!
+
+logbuch.vim can interact with tmux sessions for easier copy & pasting
+from Vim to the shell.
+
+*<leader>lt*                                 <Plug>(logbuch-tmux-setpastebuffer)
+
+        Load the visual selection to the tmux paste buffer called vim-logbuch.
+        The selection is automatically modified as with |<leader>ly| (see
+        above).
+
+Tmux provides good copy/paste buffer features and default bindings, so no
+additional bindings need to be set up by this plugin.
+
+For example, "prefix =" will display all tmux buffers with a brief preview of
+their contents.  The most recently filled buffer is listed first, so after
+copying text from Vim, "prefix = Enter" would let you review and paste the
+selection.  See BUFFERS in tmux(1) for more information.
+
+------------------------------------------------------------------------------
+COPY AND PASTE IN SCREEN SESSIONS                               *logbuch-screen*
+
+WARNING: This feature is experimental and has seen very little use!
 
 logbuch.vim can interact with a GNU screen session for easier copy & pasting
 from Vim to the shell.
@@ -128,7 +155,7 @@ a buffer.
         Write the visual selection to the screen exchange file.  The selection
         is automatically modified as with |<leader>ly| (see above).
 
-*:LogbuchExchange*                                             *LogbuchExchange*
+*:LogbuchExchange*                                               *LogbuchExchange*
 
         Prepare the current screen session for pasting from logbuch.vim by
         setting up a temporary screen exchange file in /tmp and configuring
