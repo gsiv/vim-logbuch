@@ -242,15 +242,7 @@ function! s:NewLogFromTemplate()
     " Move one line down
     call setpos('.', [0, line('.') + 1, 0, 0])
     " (Maybe) insert TODO marker
-    if exists("g:logbuch_cfg_template_marker")
-        " if not disabled by user
-        if g:logbuch_cfg_template_marker != 0
-            call <SID>ManageMarker('.', 1, 0)
-        endif
-    else
-        " if no preference configured
-        call <SID>ManageMarker('.', 1, 0)
-    endif
+    call <SID>ManageMarker(line("."), 1, 0)
 endfunction
 
 function! s:InsertMarker(pos)
@@ -272,6 +264,14 @@ function! s:ManageMarker(line, pos, fromvisual)
     " Don't do anything if buffer is readonly
     if &readonly ==1
         return
+    endif
+
+    " Don't do anything if feature disabled by user
+    if exists("g:logbuch_cfg_template_marker")
+        " if not disabled by user
+        if g:logbuch_cfg_template_marker == 0
+            return
+        endif
     endif
 
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
@@ -666,16 +666,8 @@ function! s:WriteToScreenExchangeFile()
           \ "| setlocal noreadonly noeol nofixeol " .
           \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
 
-    " (Maybe) insert TODO marker
-    if exists("g:logbuch_cfg_template_marker")
-        " if not disabled by user
-        if g:logbuch_cfg_template_marker != 0
-            call <SID>ManageMarker(line("'>"), 1, 1)
-        endif
-    else
-        " if no preference configured
-        call <SID>ManageMarker(line("'>"), 1, 1)
-    endif
+    " (Maybe) insert TODO marker after visual selection
+    call <SID>ManageMarker(line("'>"), 1, 1)
 
     " Echo copied text
     echohl LogbuchInfo
@@ -720,16 +712,8 @@ function! s:TmuxSetPasteBuffer()
           \ "| %d | 0put l | $d | w | bd" . l:tmpfile
     call system('tmux load-buffer -b ' . buffer_name . ' ' . l:tmpfile)
 
-    " (Maybe) insert TODO marker
-    if exists("g:logbuch_cfg_template_marker")
-        " if not disabled by user
-        if g:logbuch_cfg_template_marker != 0
-            call <SID>ManageMarker(line("'>"), 1, 1)
-        endif
-    else
-        " if no preference configured
-        call <SID>ManageMarker(line("'>"), 1, 1)
-    endif
+    " (Maybe) insert TODO marker after visual selection
+    call <SID>ManageMarker(line("'>"), 1, 1)
 
     " Echo copied text
     echohl LogbuchInfo
