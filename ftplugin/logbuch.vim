@@ -268,6 +268,12 @@ endfunction
 
 function! s:ManageMarker(line, pos, fromvisual)
     " Function to actually insert the marker line
+
+    " Don't do anything if buffer is readonly
+    if &readonly ==1
+        return
+    endif
+
     let l:marker = '* v v v v v v v v v v TODO v v v v v v v v v v'
     let l:wsv = winsaveview()
     let l:insert_lnum = a:line
@@ -657,7 +663,7 @@ function! s:WriteToScreenExchangeFile()
     " yank selection to register l
     silent execute 'normal! "ly'
     silent execute "edit" . s:screen_exchange .
-          \ "| setlocal nofixeol " .
+          \ "| setlocal noreadonly noeol nofixeol " .
           \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
 
     " (Maybe) insert TODO marker
@@ -710,7 +716,7 @@ function! s:TmuxSetPasteBuffer()
     " yank selection to register l
     silent execute 'normal! "ly'
     silent execute "edit" . l:tmpfile .
-          \ "| setlocal noeol nofixeol " .
+          \ "| setlocal noreadonly noeol nofixeol " .
           \ "| %d | 0put l | $d | w | bd" . l:tmpfile
     call system('tmux load-buffer -b ' . buffer_name . ' ' . l:tmpfile)
 
