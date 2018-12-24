@@ -653,6 +653,7 @@ function! s:WriteToScreenExchangeFile()
     " yank selection to register l
     silent execute 'normal! "ly'
     silent execute "edit" . s:screen_exchange .
+          \ "| setlocal nofixeol " .
           \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
 
     " (Maybe) insert TODO marker
