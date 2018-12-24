@@ -702,19 +702,17 @@ endfunction
 function! s:TmuxSetPasteBuffer()
     " Load selected logbuch text into a tmux paste buffer.
 
+    let l:tmpfile = tempname()
     let l:buffer_name = 'vim-logbuch'
-
-    call system('touch ' . shellescape(s:screen_exchange)
-                \ . ' && chmod 660 ' . shellescape(s:screen_exchange))
 
     call <SID>ModifyVisualSelection()
     let l:old_register = @l
     " yank selection to register l
     silent execute 'normal! "ly'
-    silent execute "edit" . s:screen_exchange .
-          \ "| setlocal nofixeol " .
-          \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
-    call system('tmux load-buffer -b ' . buffer_name . ' ' . s:screen_exchange)
+    silent execute "edit" . l:tmpfile .
+          \ "| setlocal noeol nofixeol " .
+          \ "| %d | 0put l | $d | w | bd" . l:tmpfile
+    call system('tmux load-buffer -b ' . buffer_name . ' ' . l:tmpfile)
 
     " (Maybe) insert TODO marker
     if exists("g:logbuch_cfg_template_marker")
