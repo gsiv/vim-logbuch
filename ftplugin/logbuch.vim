@@ -717,7 +717,7 @@ function! s:TmuxSetPasteBuffer()
 
     " Echo copied text
     echohl LogbuchInfo
-    echo 'Copied to tmux buffer ' . buffer_name . ':'
+    echo 'Copied to tmux buffer "' . buffer_name . '":'
     echohl None
     echo @l
 
