@@ -700,6 +700,16 @@ endfunction
 function! s:TmuxSetPasteBuffer()
     " Load selected logbuch text into a tmux paste buffer.
 
+    " Check that a tmux server is running.  Without it, there is no buffer to
+    " load into.
+    silent let l:hassession = system("tmux has-session")
+    if v:shell_error != 0
+        echohl LogbuchError
+        echom "ERROR: No tmux server running"
+        echohl None
+        return 1
+    endif
+
     let l:tmpfile = tempname()
     let l:buffer_name = 'vim-logbuch'
 
