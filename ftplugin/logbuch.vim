@@ -553,12 +553,21 @@ function! s:NetrwCheckRemoteSwap()
         let l:swap_file = join(l:path_list[0:-2] +
                     \ ["." . l:path_list[-1] . ".swp"], "")
         let l:sshcmd = "test -f " . l:swap_file .
-                    \" && stat --printf '%y' " . l:swap_file
+                    \" && stat --printf '%y' " . l:swap_file . " || true"
         let l:m = s:NetrwSSHCmd(l:hostname, l:sshcmd)
-        if l:m != ""
+        " Check if command succeeded at all
+        if v:shell_error != 0
             " Use built-in Error instead of LogbuchError because the latter is
             " not defined soon enough.  At least, currently this function is
             " called once at the very beginning.
+            echohl Error
+            echom "ERROR: Remote command exited with non-zero exit code ("
+                        \ . v:shell_error . ")"
+            echohl None
+            return 1
+        endif
+        " The remote stat command succeeded and a swap file was found
+        if l:m != ""
             echohl Error
             echom "ATTENTION: Found a swap file dated " . l:m . "!"
             echohl None
