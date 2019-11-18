@@ -671,9 +671,9 @@ function! s:WriteToScreenExchangeFile()
     let l:old_register = @l
     " yank selection to register l
     silent execute 'normal! "ly'
-    silent execute "edit" . s:screen_exchange .
+    silent execute "keepalt edit" . s:screen_exchange .
           \ "| setlocal noreadonly noeol nofixeol " .
-          \ "| %d | 0put l | $d | w | bd" . s:screen_exchange
+          \ "| %d | 0put l | $d | w | keepalt bd" . s:screen_exchange
 
     " (Maybe) insert TODO marker after visual selection
     call <SID>ManageMarker(line("'>"), 1, 1)
@@ -726,9 +726,9 @@ function! s:TmuxSetPasteBuffer()
     let l:old_register = @l
     " yank selection to register l
     silent execute 'normal! "ly'
-    silent execute "edit" . l:tmpfile .
+    silent execute "keepalt edit" . l:tmpfile .
           \ "| setlocal noreadonly noeol nofixeol " .
-          \ "| %d | 0put l | $d | w | bd" . l:tmpfile
+          \ "| %d | 0put l | $d | w | keepalt bd" . l:tmpfile
     call system('tmux load-buffer -b ' . buffer_name . ' ' . l:tmpfile)
 
     " (Maybe) insert TODO marker after visual selection
