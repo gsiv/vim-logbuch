@@ -22,6 +22,10 @@ let s:dateline_pattern = '^[0-9]\{2}\.[0-9]\{2}\.[0-9]\{4}\t'
 let s:user = $LOGNAME
 let s:screen_exchange = "/tmp/logbuch-screen-exchange-" . s:user
 
+" Include @ character in path names to be able to open, e.g., systemd template
+" files such asexample@.service.
+setlocal isfname+=@-@
+
 " {{{ <Plug> Mappings
 " Navigation: Normal mode
 "  logbuch entry date lines
